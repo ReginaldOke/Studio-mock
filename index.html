@@ -1079,7 +1079,8 @@ function hitTest(x, y, click){
 
 /* ---------- UI ---------- */
 const dock = document.getElementById('dock');
-for (const p of panels){
+const chipOrder = [panels.find(p=>p.id==='outer'), ...panels.filter(p=>p.id!=='outer')];
+for (const p of chipOrder){
   if (p.noChip) continue;
   const b = document.createElement('button');
   b.className='chip'; b.id='chip-'+p.id; b.setAttribute('aria-pressed','true');
