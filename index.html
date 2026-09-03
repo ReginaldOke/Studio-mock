@@ -70,20 +70,21 @@
 
   .dock{
     position:fixed; left:50%; bottom:16px; transform:translateX(-50%); z-index:5;
-    display:flex; gap:8px; padding:8px; border-radius:12px; max-width:calc(100vw - 24px);
-    background:var(--card); border:1px solid var(--line); overflow-x:auto;
-    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-    scrollbar-width:none; -webkit-overflow-scrolling:touch;
+    display:flex; gap:8px; padding:6px 4px; max-width:calc(100vw - 24px);
+    overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
   }
   .dock::-webkit-scrollbar{display:none}
   .chip{
     appearance:none; display:flex; align-items:center; gap:7px; white-space:nowrap; cursor:pointer;
-    border:1px solid var(--line); background:transparent; color:var(--ink);
-    font:600 12.5px 'Archivo',sans-serif; padding:7px 12px 7px 9px; border-radius:8px;
-    transition:opacity .15s, border-color .15s;
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    box-shadow:0 2px 10px var(--shadow);
+    font:600 12.5px 'Archivo',sans-serif; padding:7px 12px 7px 9px; border-radius:9px;
+    transition:opacity .15s, border-color .15s, transform .1s;
   }
+  .chip:active{transform:scale(.94)}
   .chip .sw{width:11px; height:11px; border-radius:3px; background:var(--sw); flex:none}
-  .chip[aria-pressed="false"]{opacity:.55; border-style:dashed; color:var(--chip-off)}
+  .chip[aria-pressed="false"]{opacity:.5; border-style:dashed; color:var(--chip-off); box-shadow:none}
   .chip[aria-pressed="false"] .sw{background:transparent; border:1.5px dashed var(--chip-off)}
   .chip:hover{border-color:var(--ink2)}
 
@@ -120,7 +121,9 @@
       bottom:calc(62px + env(safe-area-inset-bottom));
       max-width:calc(100vw - 12px); overflow-x:auto; padding:2px}
     .btn{padding:6px 10px; font-size:12px; white-space:nowrap}
-    .dock{bottom:calc(8px + env(safe-area-inset-bottom)); max-width:calc(100vw - 12px); padding:6px; gap:6px}
+    .dock{bottom:calc(8px + env(safe-area-inset-bottom)); max-width:calc(100vw - 12px); padding:6px 4px; gap:6px;
+      mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 34px), transparent);
+      -webkit-mask-image:linear-gradient(90deg, #000 0, #000 calc(100% - 34px), transparent)}
     .chip{padding:6px 10px 6px 8px; font-size:11.5px}
     aside{padding:16px 14px 24px}
   }
@@ -286,6 +289,18 @@
   </section>
 
   <section class="cut">
+    <h3>Total timber · 35 × 90 planks <span class="dim mono">≈ 248.7 m</span></h3>
+    <table class="mono">
+      <tr><td>Wall A</td><td>46.0 m</td></tr>
+      <tr><td>Wall B (with doorway)</td><td>44.2 m</td></tr>
+      <tr><td>End walls</td><td>31.3 m each — 62.5 m</td></tr>
+      <tr><td>Floor deck</td><td>60.5 m (includes the 4.6 m support row)</td></tr>
+      <tr><td>Roof</td><td>35.5 m</td></tr>
+      <tr><td>Total</td><td>248.7 m of 90 × 35 — buy ≈275 m for cutting waste. Uprights are 2420 cuts, so use ≥2.7 m stock for those; the long planks need 5.4 m lengths (about 10 of them), the rest cuts well from 2.7 / 3.0 m</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
     <h3>Assembled</h3>
     <table class="mono">
       <tr><td>Room outer</td><td>5035 × 3500 × 2670 (floor 90 + walls 2490 + roof 90) — on 32 adjustable feet, deck at +55, roof tops out at 2725 above slab datum</td></tr>
@@ -376,7 +391,7 @@ const wallBMembers = (() => {
     for (const [x,w] of [[36,555],[1218,555],[2418,564],[3944,238],[4818,181]]) m.push([x,y,w,36]);
   for (const y of [877,1755])
     for (const [x,w] of [[627,555],[1809,573],[4218,564]]) m.push([x,y,w,36]);
-  m.push([3053,450,820,2040, 0, 2]);                         // the door itself
+  // (the door leaf itself is its own translucent layer — see the 'door' panel)
   // jamb (the frame the door hangs in): two legs + a head piece, 30 thick,
   // packed off the structure with plastic packers
   m.push([3023,420,30,2070, 0, 3]);                          // left jamb leg
@@ -619,6 +634,10 @@ const panels = [
       ],
       tag:null};
   })(),
+  /* the door leaf: slightly translucent, toggles with Wall B */
+  {id:'door', label:'Door', color:'#7a5c40', alpha:0.55, on:true, noChip:true,
+   faces:buildPanel([[3053,450,820,2040]], (mx,my,w,h)=>{ const [y0,y1]=wallY(my,h); return wbox(mx,mx+w, y0,y1, W-T,W); }),
+   tag:null},
 ];
 for (const p of panels) for (const f of p.faces) f.panel = p;
 
@@ -630,7 +649,7 @@ const flatDeck = (members, ox, oz) => buildPanel(members, (mx,my,w,h)=> box(ox+m
     floor:{f:()=>flatDeck([...deckMembers, ...deckBlocking],0,0), tag:[2517,1750], t:'Floor deck · 5035 × 3500'},
     roof: {f:()=>flatDeck(roofMembers,0,4200),    tag:[2517,5950],  t:'Roof · 5035 × 3500'},
     wallA:{f:()=>flatWall(longWallMembers,5835,0),   tag:[8352,1245],  t:'Wall A · 5035 × 2490'},
-    wallB:{f:()=>flatWall(wallBMembers,5835,3350),tag:[8352,4595],  t:'Wall B · 5035 × 2490 · door'},
+    wallB:{f:()=>flatWall([...wallBMembers, [3053,450,820,2040,0,2]],5835,3350),tag:[8352,4595],  t:'Wall B · 5035 × 2490 · door'},
     front:{f:()=>flatWall(endWallMembers,5835,6700), tag:[7495,7945],  t:'Front · 3320 × 2490'},
     back: {f:()=>flatWall(endWallMembers,9755,6700), tag:[11415,7945], t:'Back · 3320 × 2490'},
   };
@@ -749,6 +768,10 @@ const isoDims = {
     {a:[-20,0,6300], b:[3357,0,6300], off:[0,0,340], t:'3377'},
     {a:[3357,0,6300], b:[6980,0,6300], off:[0,0,340], t:'3623'},
     {a:[3357,0,-20], b:[3357,30,-20], off:[0,0,-340], t:'+30'},
+  ],
+  door: [
+    {a:[3053,FLOOR_TOP,W-T], b:[3873,FLOOR_TOP,W-T], off:[0,0,-320], t:'820'},
+    {a:[3873,FLOOR_TOP,W-T], b:[3873,FLOOR_TOP+2040,W-T], off:[320,0,-160], t:'2040'},
   ],
   outer: [
     {a:[-20,0,6980], b:[6980,0,6980], off:[0,0,560], t:'7000'},
@@ -1095,6 +1118,7 @@ function setPanel(id, on){
   if (isolated) isolated = null;
   const p = panels.find(q=>q.id===id); p.on=on;
   if (id === 'man') panels.find(q=>q.id==='piano').on = on; // person + piano share a toggle
+  if (id === 'wallB') panels.find(q=>q.id==='door').on = on; // door travels with its wall
   const chip = document.getElementById('chip-'+id);
   if (chip) chip.setAttribute('aria-pressed', String(on));
   if (hoverPanel===id && !on) hoverPanel=null;
