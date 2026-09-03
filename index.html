@@ -155,10 +155,10 @@
 
 <div class="dock" id="dock" role="group" aria-label="Toggle panels"></div>
 
-<aside id="drawer" aria-label="Cut list and exact measurements">
+<aside id="drawer" aria-label="Cut list">
   <button class="btn close" id="closeBtn">Close</button>
-  <h2>Cut list — exact Figma measurements</h2>
-  <p class="note">All sizes in mm (1 px in Figma = 1 mm). Every plank is 35 wide × 90 deep unless noted. The coloured dots below match this picture:</p>
+  <h2>Cut list</h2>
+  <p class="note">All sizes in mm. Every plank is 35 wide × 90 deep. The coloured dots match this picture:</p>
   <div class="legend">
     <p>How every framed panel goes together — three kinds of piece:</p>
     <svg viewBox="0 0 360 134" role="img" aria-label="Diagram of a framed panel: top and bottom planks, upright planks, short crosspieces">
@@ -184,66 +184,63 @@
   </div>
 
   <section class="cut">
-    <h3>Long walls · <span class="mono">“Wall” / “Wall 2”</span> <span class="dim mono">5035 × 2490 × 90</span></h3>
+    <h3>Shopping list</h3>
     <table class="mono">
-      <tr><td><span class="dot dA"></span>Top &amp; bottom planks × 2</td><td>5035 × 35 — one along the top, one along the bottom</td></tr>
-      <tr><td><span class="dot dB"></span>Upright planks × 10</td><td>36 wide, cut 2420 long, standing between the top &amp; bottom planks — left edges at 0, 591, 1182, 1773, 2382, 2982, 3582, 4182, 4782, 4999</td></tr>
-      <tr><td><span class="dot dC"></span>Short crosspieces × 23</td><td>sit horizontally between the uprights to stop them bowing — 5 staggered rows, 478 / 877 / 1268 / 1755 / 2059 down from the top; lengths 555 / 564 / 573 (one 181 in the narrow end gap)</td></tr>
-      <tr><td>Doorway (Wall B only)</td><td>rough opening 890 wide × 2107 tall, right of centre (3018–3908) — fits a standard Australian 2040 × 820 door. Changes: the upright at 3582 is cut to a 313 piece above the door; a new full upright goes in at 3908; a 890 × 35 piece caps the opening; the bottom plank is left out across the opening; 3 crosspieces in that zone are dropped and 3 shortened to 238</td></tr>
-      <tr><td>Door frame (jamb)</td><td>30-thick surround the door hangs in — two 2070 legs + an 820 head piece, packed off the framing with plastic packers (5 each side, ~37 above) and screwed through the packers into the uprights. Easiest bought as a pre-hung door + frame set</td></tr>
-      <tr><td>Wall A</td><td>as drawn, no door</td></tr>
+      <tr><td>Planks 90 × 35</td><td>≈275 m (248.7 m of cuts + waste). 5.4 m lengths for the ~10 long planks; ≥2.7 m stock for the 2420 uprights</td></tr>
+      <tr><td>OSB sheets</td><td>20 × <a href="https://www.bunnings.com.au/2745-x-1200mm-6mm-braceboard-osb_p0166651" target="_blank" rel="noopener" style="color:var(--accent)">2745 × 1200 braceboard</a></td></tr>
+      <tr><td>Feet</td><td>32 × Builders Edge pedestal feet (<a href="https://www.bunnings.com.au/builders-edge-25-40mm-minifoot-pedestal-feet_p2450073" target="_blank" rel="noopener" style="color:var(--accent)">25–40</a> mid-room, <a href="https://www.bunnings.com.au/builders-edge-pedestal-foot-smallfoot-35-60mm_p2450074" target="_blank" rel="noopener" style="color:var(--accent)">35–60</a> at the ends) + 3 × <a href="https://www.bunnings.com.au/jack-100mm-x-1m-anti-vibration-pad_p3961983" target="_blank" rel="noopener" style="color:var(--accent)">rubber roll</a> + 1 bucket of <a href="https://www.bunnings.com.au/macsim-140mm-assorted-packer-window-100-bucket_p0091691" target="_blank" rel="noopener" style="color:var(--accent)">packers</a></td></tr>
+      <tr><td>Door</td><td>pre-hung 2040 × 820 door + frame set</td></tr>
     </table>
   </section>
 
   <section class="cut">
-    <h3>End walls · <span class="mono">“front wall” / “back wall”</span> <span class="dim mono">3320 × 2490 × 90</span></h3>
+    <h3>Long walls × 2 <span class="dim mono">5035 × 2490</span></h3>
     <table class="mono">
-      <tr><td>Sized to fit</td><td>cut 90 narrower on each side than the Figma drawing, so they slot between the two long walls</td></tr>
-      <tr><td><span class="dot dA"></span>Top &amp; bottom planks × 2</td><td>3320 × 35</td></tr>
-      <tr><td><span class="dot dB"></span>Upright planks × 7</td><td>36 wide × 2420 — at 0, 501, 1092, 1692, 2292, 2833, 3284</td></tr>
-      <tr><td><span class="dot dC"></span>Short crosspieces × 15</td><td>5 staggered rows at 492 / 825 / 1282 / 1703 / 2072 — lengths 465 / 505 / 555 / 564 / 415</td></tr>
-      <tr><td>Both walls</td><td>identical</td></tr>
+      <tr><td><span class="dot dA"></span>Top &amp; bottom</td><td>5035 × 35 — 2 per wall</td></tr>
+      <tr><td><span class="dot dB"></span>Uprights × 10</td><td>cut 2420 — at 0, 591, 1182, 1773, 2382, 2982, 3582, 4182, 4782, 4999</td></tr>
+      <tr><td><span class="dot dC"></span>Crosspieces × 23</td><td>rows at 478 / 877 / 1268 / 1755 / 2059 down from the top — cut each to its gap (555–573, one 181)</td></tr>
+      <tr><td>Doorway (Wall B)</td><td>opening 890 × 2107 starting at 3018 — add a full upright at 3908, a 313 piece over the door, an 890 cap; leave the bottom plank out across the opening</td></tr>
     </table>
   </section>
 
   <section class="cut">
-    <h3>Floor deck · <span class="mono">labeled “Wall 2”</span> <span class="dim mono">5035 × 3500 × 90</span></h3>
+    <h3>End walls × 2 <span class="dim mono">3320 × 2490</span></h3>
     <table class="mono">
-      <tr><td>Sized to fit</td><td>the Figma drawing is 35 too deep — trimmed to the 3500 footprint</td></tr>
-      <tr><td><span class="dot dA"></span>Border planks × 4</td><td>two sides 35 × 3500 (at 0 and 5000), two ends 4965 × 35 between them (at 0 and 3465)</td></tr>
-      <tr><td><span class="dot dA"></span>Middle plank</td><td>4965 × 35, across the deck at 1535</td></tr>
-      <tr><td><span class="dot dB"></span>Deck planks × 20</td><td>the long planks your floor boards sit on, spaced 455 apart — ten cut 1500 (front half), ten cut 1895 (back half)</td></tr>
-      <tr><td><span class="dot dR"></span>Add: support row</td><td>11 short offcut pieces (10 × 420 + 1 × 415) between the deck planks, staggered either side of the 2500 line — the stagger means every piece can be nailed straight through the planks into its ends. Makes a fourth support line, with 7 feet under it. Shown red in the 3D model and the 2D net</td></tr>
-      <tr><td>Note in file</td><td>“3500”</td></tr>
+      <tr><td><span class="dot dA"></span>Top &amp; bottom</td><td>3320 × 35 — 2 per wall</td></tr>
+      <tr><td><span class="dot dB"></span>Uprights × 7</td><td>cut 2420 — at 0, 501, 1092, 1692, 2292, 2833, 3284</td></tr>
+      <tr><td><span class="dot dC"></span>Crosspieces × 15</td><td>rows at 492 / 825 / 1282 / 1703 / 2072 — cut to gap (415–564)</td></tr>
     </table>
   </section>
 
   <section class="cut">
-    <h3>Roof · <span class="mono">“Roof” (updated)</span> <span class="dim mono">5035 × 3500 × 90</span></h3>
+    <h3>Floor deck <span class="dim mono">5035 × 3500</span></h3>
     <table class="mono">
-      <tr><td>Sized to fit</td><td>the Figma drawing is 35 too deep — one border plank pulled in flush to 3500</td></tr>
-      <tr><td><span class="dot dA"></span>Border planks × 4</td><td>each runs past the next, windmill style — 35 × 3465 · 5000 × 35 · 35 × 3430 · 5035 × 35</td></tr>
-      <tr><td><span class="dot dB"></span>Cross planks × 4</td><td>35 × 3430, running the short way across the roof — at 920, 1840, 2760, 3897</td></tr>
-      <tr><td><span class="dot dC"></span>Short crosspieces × 5</td><td>a stiffening row halfway across (at 1732) — lengths 885 / 885 / 885 / 1102 / 1068</td></tr>
+      <tr><td><span class="dot dA"></span>Border + middle</td><td>sides 3500 × 35 × 2 · ends and middle 4965 × 35 × 3 (middle at 1535)</td></tr>
+      <tr><td><span class="dot dB"></span>Deck planks × 20</td><td>455 apart — 10 × 1500 and 10 × 1895</td></tr>
+      <tr><td><span class="dot dR"></span>Support row</td><td>11 offcut pieces (420, one 415) staggered along the 2500 line — nail through the planks into their ends; 7 feet go under this line</td></tr>
     </table>
   </section>
 
   <section class="cut">
-    <h3>OSB lining · interior <span class="dim mono">sheets 2745 × 1200 × 12</span></h3>
+    <h3>Roof <span class="dim mono">5035 × 3500</span></h3>
     <table class="mono">
-      <tr><td>Join check</td><td>the sheet joins at 1200 / 2400 / 3600 / 4800 land dead-centre on the upright planks — the layout works ✓</td></tr>
-      <tr><td>Wall A</td><td>1 sheet cut to 1110 wide + 3 full sheets + a 145 strip, corner to corner (4855) — the corner sheet loses 90 to the wall it meets; the joins stay on the uprights</td></tr>
-      <tr><td>Wall B (door wall)</td><td>same, but the two sheets at the door are cut to 618 and 892 around the opening, plus a strip above the door (join it over the short upright at 3460 — it can come from the offcuts)</td></tr>
-      <tr><td>End walls (each)</td><td>a 1098 cut + 1 full sheet + a 998 cut, fitting between the long-wall boards (3296)</td></tr>
-      <tr><td>Height</td><td>one sheet covers the wall — cut 2745 down to 2478 (stops under the ceiling boards)</td></tr>
+      <tr><td><span class="dot dA"></span>Border × 4</td><td>3465 · 5000 · 3430 · 5035 — each runs past the next, windmill style</td></tr>
+      <tr><td><span class="dot dB"></span>Cross planks × 4</td><td>cut 3430 — at 920, 1840, 2760, 3897</td></tr>
+      <tr><td><span class="dot dC"></span>Stiffening row</td><td>at 1732 — 885 × 3, 1102, 1068</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
+    <h3>OSB lining <span class="dim mono">2745 × 1200 sheets</span></h3>
+    <table class="mono">
+      <tr><td>Walls</td><td>sheets stand upright, cut 2478 tall — joins land on the uprights at 1200 / 2400 / 3600 / 4800. Corner sheets cut to 1110 (long walls) and 1098 (end walls); the two door sheets cut to 618 + 892 with a strip above the door</td></tr>
       <tr><td>Ceiling</td><td>2 columns (2655 / 2200) × 3 rows (1110 / 1200 / 1010)</td></tr>
-      <tr><td>Buy</td><td>20 sheets of 2745 × 1200 — cutting layout in the 2D net view (the two 145 rips share sheets with the two 998 rips)</td></tr>
-      <tr><td>Ceiling flag</td><td>the ceiling joins matched an older roof drawing; the current cross planks miss them — the 2745 join is 15 off the third cross plank, and the 1200 / 2400 joins have nothing behind them (the stiffening row sits at 1732). Move that row to two rows at 1200 and 2400, or add battens</td></tr>
+      <tr><td>Cutting plan</td><td>every sheet drawn in the 2D net view</td></tr>
     </table>
   </section>
 
   <section class="cut">
-    <h3>Feet · adjustable pedestals <span class="dim mono">h 25–55 · deck at +55</span></h3>
+    <h3>Feet <span class="dim mono">deck level at +55</span></h3>
     <div class="mini">
       <svg viewBox="0 0 360 118" role="img" aria-label="Diagram of one foot: rubber square on the concrete, screw-adjustable foot, floor frame plank on top">
         <rect x="100" y="8" width="160" height="26" rx="2" fill="#86ab8c"/>
@@ -261,62 +258,20 @@
       </svg>
     </div>
     <table class="mono">
-      <tr><td>Products</td><td><a href="https://www.bunnings.com.au/builders-edge-25-40mm-minifoot-pedestal-feet_p2450073" target="_blank" rel="noopener" style="color:var(--accent)">Builders Edge Minifoot 25–40</a> over the crown zone + <a href="https://www.bunnings.com.au/builders-edge-pedestal-foot-smallfoot-35-60mm_p2450074" target="_blank" rel="noopener" style="color:var(--accent)">Smallfoot 35–60</a> at the low ends — screw-adjustable, &gt;200 kg each, fastened to the deck rails; a 100 × 100 square of <a href="https://www.bunnings.com.au/jack-100mm-x-1m-anti-vibration-pad_p3961983" target="_blank" rel="noopener" style="color:var(--accent)">Jack 4 rubber</a> under every base decouples it from the slab</td></tr>
-      <tr><td>Layout</td><td>28 spread along the deck’s four support lines (about 840 apart) + 4 extra under the piano corner, front-left</td></tr>
-      <tr><td>Piano check</td><td>~300 kg upright piano at the front-left wall — with the extra feet, the busiest foot carries under ≈150 kg vs its 200 kg+ rating</td></tr>
-      <tr><td>Levelling</td><td>wind each foot up or down to a laser line — the deck ends up dead level at +55 (the shortest foot is 25, riding the floor’s high spot)</td></tr>
-      <tr><td>Buy</td><td>32 feet (≈$295) + 4 rubber rolls (each roll cuts into 10 squares → 32 needed, 8 spare)</td></tr>
+      <tr><td>Layout</td><td>32 feet — one every ~840 along the deck’s four support lines, plus 4 extra under the piano corner (front-left)</td></tr>
+      <tr><td>Levelling</td><td>rubber square under each base, then wind each foot to a laser line — ≈25 on the floor’s high spot, up to ≈55 at the low ends</td></tr>
     </table>
   </section>
 
   <section class="cut">
-    <h3>Slab · warehouse floor <span class="dim mono">crown +30</span></h3>
+    <h3>Key numbers</h3>
     <table class="mono">
-      <tr><td>Survey</td><td>not level — rises about 30 to a high spot 3377 from the tall wall (about 2⁄3 of the way along the studio), then falls about 30 to the far wall</td></tr>
-      <tr><td>Shown</td><td>true-scale surface tinted by height (purple = high)</td></tr>
-      <tr><td>Consequence</td><td>handled — the deck is levelled on the adjustable feet above, clear of the high spot</td></tr>
-    </table>
-  </section>
-
-  <section class="cut">
-    <h3>Outer room · warehouse <span class="dim mono">7000 × 7000</span></h3>
-    <table class="mono">
-      <tr><td>Ceiling</td><td>3050 at the tall wall, sloping down 280 over the studio’s 5035 length (about 3.2°, the slope from your sketch) and continuing — about 2661 at the far wall (calculated)</td></tr>
-      <tr><td>Studio placement</td><td>tucked into the corner — 20 gap to the tall wall and 20 to the side wall</td></tr>
-      <tr><td>Headroom check</td><td>studio top is 2725 on its feet; the ceiling is ≈2769 over its far corner — ≈44 clearance (the levelling used 55 of the 100 budget)</td></tr>
-      <tr><td>Shell</td><td>drawn 100 thick for context — not a build item</td></tr>
-    </table>
-  </section>
-
-  <section class="cut">
-    <h3>Total timber · 35 × 90 planks <span class="dim mono">≈ 248.7 m</span></h3>
-    <table class="mono">
-      <tr><td>Wall A</td><td>46.0 m</td></tr>
-      <tr><td>Wall B (with doorway)</td><td>44.2 m</td></tr>
-      <tr><td>End walls</td><td>31.3 m each — 62.5 m</td></tr>
-      <tr><td>Floor deck</td><td>60.5 m (includes the 4.6 m support row)</td></tr>
-      <tr><td>Roof</td><td>35.5 m</td></tr>
-      <tr><td>Total</td><td>248.7 m of 90 × 35 — buy ≈275 m for cutting waste. Uprights are 2420 cuts, so use ≥2.7 m stock for those; the long planks need 5.4 m lengths (about 10 of them), the rest cuts well from 2.7 / 3.0 m</td></tr>
-    </table>
-  </section>
-
-  <section class="cut">
-    <h3>Assembled</h3>
-    <table class="mono">
-      <tr><td>Room outer</td><td>5035 × 3500 × 2670 (floor 90 + walls 2490 + roof 90) — on 32 adjustable feet, deck at +55, roof tops out at 2725 above slab datum</td></tr>
+      <tr><td>Room outer</td><td>5035 × 3500 × 2670 — tops out 2725 above the slab on its feet</td></tr>
       <tr><td>Clear inside</td><td>4855 × 3320 × 2490</td></tr>
-      <tr><td>Height budget</td><td>upright planks are 2420 = 2770 − two 35 planks − 90 floor − 90 roof − 100 spare; inside height after boards ≈ 2396 per your calc</td></tr>
-      <tr><td>How it stacks</td><td>floor, walls and roof all share the same 5035 × 3500 outline — every joint sits flush, nothing overlaps</td></tr>
-      <tr><td>Stock</td><td>plank 35 × 90</td></tr>
+      <tr><td>Warehouse fit</td><td>20 gap to the corner walls; ≈44 clearance under the sloping ceiling at the far top corner</td></tr>
+      <tr><td>Slab</td><td>humps +30 about ⅔ of the way along — the feet heights absorb it</td></tr>
     </table>
   </section>
-
-  <div class="flags">
-    <p class="flag"><b>Walls built the way they’ll be screwed together.</b> Height set to 2490 from the warehouse budget (uprights cut 2420). The Figma net draws the uprights full-height with the horizontal planks laid over them; here the uprights sit between full-width top &amp; bottom planks, and the short crosspieces are cut to the exact gaps. Floor and roof sandwich the walls — nothing overlaps anywhere.</p>
-    <p class="flag"><b>End walls cut down from the drawing.</b> The file draws them 3500 wide, which crashes into the long walls at the corners; here they are cut to 3320 (90 off each side) and slot between the long walls. The middle uprights keep their drawn spacing; new edge uprights sit on the cut lines.</p>
-    <p class="flag"><b>Two panels are labeled with the wrong size.</b> The planked deck is labeled “Wall 2: 5035 × 2700” and the roof “5035 × 2700”, but both are drawn ≈3500 deep — exactly matching the end walls. They are modeled as the floor and roof of the room.</p>
-    <p class="flag"><b>Deck and roof trimmed flush.</b> The net draws both 35 (one plank width) too deep. Both are cut to exactly 5035 × 3500: the deck’s long planks shorten to 1895 and its offset border planks are pulled into line; the roof keeps its windmill corners with one border plank pulled in, cross planks cut 3430, and the stiffening row cut to the exact gaps.</p>
-  </div>
 </aside>
 
 <script>
