@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Alloy Studio 5035</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#eef0ec; --card:rgba(252,252,250,.86); --ink:#26292b; --ink2:#5f6468;
+    --line:rgba(38,41,43,.22); --accent:#c14e38; --accent-soft:rgba(193,78,56,.12);
+    --grid:rgba(38,41,43,.08); --grid2:rgba(38,41,43,.15); --shadow:rgba(30,32,34,.10);
+    --chip-off:#9aa0a3; --pill:rgba(252,252,250,.92); --flag:#8a5a24; --flag-bg:rgba(193,131,56,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15181c; --card:rgba(25,28,33,.86); --ink:#e9e7e2; --ink2:#9aa0a6;
+      --line:rgba(233,231,226,.22); --accent:#ff8a68; --accent-soft:rgba(255,138,104,.14);
+      --grid:rgba(233,231,226,.06); --grid2:rgba(233,231,226,.12); --shadow:rgba(0,0,0,.38);
+      --chip-off:#6a7076; --pill:rgba(25,28,33,.92); --flag:#e0b070; --flag-bg:rgba(224,176,112,.12);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15181c; --card:rgba(25,28,33,.86); --ink:#e9e7e2; --ink2:#9aa0a6;
+    --line:rgba(233,231,226,.22); --accent:#ff8a68; --accent-soft:rgba(255,138,104,.14);
+    --grid:rgba(233,231,226,.06); --grid2:rgba(233,231,226,.12); --shadow:rgba(0,0,0,.38);
+    --chip-off:#6a7076; --pill:rgba(25,28,33,.92); --flag:#e0b070; --flag-bg:rgba(224,176,112,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink); overflow:hidden;
+    font-family:'Archivo',system-ui,-apple-system,sans-serif; font-size:14px; line-height:1.45;
+    overscroll-behavior:none; -webkit-tap-highlight-color:transparent;
+  }
+  #stage{position:fixed; inset:0; touch-action:none; cursor:grab}
+  #stage.dragging{cursor:grabbing}
+  #stage canvas{position:absolute; inset:0; width:100%; height:100%}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace; font-variant-numeric:tabular-nums}
+
+  header{
+    position:fixed; top:16px; left:16px; z-index:5; max-width:min(350px, calc(100vw - 32px));
+    background:var(--card); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border:1px solid var(--line); border-radius:10px; padding:10px 14px;
+    cursor:pointer; user-select:none; -webkit-user-select:none;
+  }
+  header.open{padding:14px 16px 12px}
+  header h1{margin:0; font-size:17px; font-weight:800; letter-spacing:-.01em; display:flex; align-items:center; gap:9px}
+  .infoIcon{
+    width:20px; height:20px; flex:none; border:1.5px solid var(--ink2); border-radius:50%;
+    color:var(--ink2); font:600 12px 'Archivo',sans-serif; font-style:normal;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  header:not(.open) .sub, header:not(.open) .stats, header:not(.open) .hint{display:none !important}
+  header .sub{margin:6px 0 8px; color:var(--ink2); font-size:12.5px}
+  header .stats{font-size:12px; color:var(--ink); display:flex; gap:14px; flex-wrap:wrap}
+  header .stats b{font-weight:600; color:var(--ink2); text-transform:uppercase; letter-spacing:.06em; font-size:10px; display:block}
+  .hint{margin-top:10px; padding-top:9px; border-top:1px solid var(--line); color:var(--ink2); font-size:11.5px}
+
+  .actions{position:fixed; top:16px; right:16px; z-index:6; display:flex; gap:8px}
+  .btn{
+    appearance:none; border:1px solid var(--line); background:var(--card); color:var(--ink);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    font:600 13px 'Archivo',sans-serif; padding:8px 14px; border-radius:8px; cursor:pointer;
+  }
+  .btn, .chip{touch-action:manipulation}
+  .btn:hover{border-color:var(--ink2)}
+  .btn[aria-pressed="true"]{background:var(--accent-soft); border-color:var(--accent); color:var(--accent)}
+  .btn:focus-visible, .chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  .dock{
+    position:fixed; left:50%; bottom:16px; transform:translateX(-50%); z-index:5;
+    display:flex; gap:8px; padding:8px; border-radius:12px; max-width:calc(100vw - 24px);
+    background:var(--card); border:1px solid var(--line); overflow-x:auto;
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  }
+  .dock::-webkit-scrollbar{display:none}
+  .chip{
+    appearance:none; display:flex; align-items:center; gap:7px; white-space:nowrap; cursor:pointer;
+    border:1px solid var(--line); background:transparent; color:var(--ink);
+    font:600 12.5px 'Archivo',sans-serif; padding:7px 12px 7px 9px; border-radius:8px;
+    transition:opacity .15s, border-color .15s;
+  }
+  .chip .sw{width:11px; height:11px; border-radius:3px; background:var(--sw); flex:none}
+  .chip[aria-pressed="false"]{opacity:.55; border-style:dashed; color:var(--chip-off)}
+  .chip[aria-pressed="false"] .sw{background:transparent; border:1.5px dashed var(--chip-off)}
+  .chip:hover{border-color:var(--ink2)}
+
+  aside{
+    position:fixed; top:0; right:0; bottom:0; width:min(410px,100vw); z-index:8;
+    background:var(--card); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-left:1px solid var(--line); transform:translateX(102%); transition:transform .25s ease;
+    overflow-y:auto; padding:18px 20px 28px;
+  }
+  aside.open{transform:none}
+  @media (prefers-reduced-motion: reduce){ aside{transition:none} }
+  aside h2{font-size:15px; font-weight:800; margin:2px 0 2px}
+  aside .note{color:var(--ink2); font-size:12px; margin:0 0 14px}
+  aside .close{position:absolute; top:12px; right:12px; padding:5px 10px}
+  .cut{margin:0 0 16px}
+  .cut h3{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink2); margin:0 0 6px; display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+  .cut h3 .dim{color:var(--ink); font-size:12px; letter-spacing:0; text-transform:none}
+  .dot{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px}
+  .dA{background:#7f96ad} .dB{background:#86ab8c} .dC{background:#d9a05e} .dR{background:#d64541}
+  .legend, .mini{border:1px solid var(--line); border-radius:8px; padding:10px; margin:0 0 12px}
+  .legend svg, .mini svg{width:100%; height:auto; display:block}
+  .legend p{margin:0 0 8px; font-size:11.5px; color:var(--ink2)}
+  table{width:100%; border-collapse:collapse; font-size:12.5px}
+  td{padding:4px 0; border-top:1px solid var(--line); vertical-align:top}
+  td:first-child{color:var(--ink2); padding-right:10px; width:38%}
+  .flags{border-top:2px solid var(--line); padding-top:12px; margin-top:4px}
+  .flag{background:var(--flag-bg); color:var(--flag); border-radius:8px; padding:8px 10px; font-size:12px; margin:0 0 8px}
+  .flag b{font-weight:700}
+
+  @media (max-width:640px){
+    header{max-width:calc(100vw - 20px); top:10px; left:10px; padding:9px 12px}
+    header h1{font-size:15px}
+    .actions{top:auto; right:auto; left:50%; transform:translateX(-50%);
+      bottom:calc(62px + env(safe-area-inset-bottom));
+      max-width:calc(100vw - 12px); overflow-x:auto; padding:2px}
+    .btn{padding:6px 10px; font-size:12px; white-space:nowrap}
+    .dock{bottom:calc(8px + env(safe-area-inset-bottom)); max-width:calc(100vw - 12px); padding:6px; gap:6px}
+    .chip{padding:6px 10px 6px 8px; font-size:11.5px}
+    aside{padding:16px 14px 24px}
+  }
+</style>
+
+<div id="stage" role="img" aria-label="Rotatable 3D model of the aluminium studio room">
+  <canvas id="bg"></canvas>
+  <canvas id="glc"></canvas>
+  <canvas id="ov"></canvas>
+</div>
+
+<header role="button" tabindex="0" aria-expanded="false" aria-label="Studio — model info">
+  <h1>Studio <span class="infoIcon" aria-hidden="true">i</span></h1>
+  <p class="sub">Music studio room · all values in mm</p>
+  <div class="stats mono">
+    <span><b>Footprint</b>5035 × 3500</span>
+    <span><b>Wall height</b>2490</span>
+    <span><b>Planks</b>35 × 90</span>
+  </div>
+  <p class="hint">Drag to rotate · scroll or pinch to zoom · click a panel to isolate it with its measurements · chips below turn panels on and off</p>
+</header>
+
+<div class="actions">
+  <button class="btn" id="netBtn" aria-pressed="false">2D net</button>
+  <button class="btn" id="dimsBtn" aria-pressed="true">Dimensions</button>
+  <button class="btn" id="listBtn" aria-pressed="false">Cut list</button>
+  <button class="btn" id="resetBtn">Reset view</button>
+</div>
+
+<div class="dock" id="dock" role="group" aria-label="Toggle panels"></div>
+
+<aside id="drawer" aria-label="Cut list and exact measurements">
+  <button class="btn close" id="closeBtn">Close</button>
+  <h2>Cut list — exact Figma measurements</h2>
+  <p class="note">All sizes in mm (1 px in Figma = 1 mm). Every plank is 35 wide × 90 deep unless noted. The coloured dots below match this picture:</p>
+  <div class="legend">
+    <p>How every framed panel goes together — three kinds of piece:</p>
+    <svg viewBox="0 0 360 134" role="img" aria-label="Diagram of a framed panel: top and bottom planks, upright planks, short crosspieces">
+      <rect x="12" y="6" width="336" height="12" rx="2" fill="#7f96ad"/>
+      <rect x="12" y="100" width="336" height="12" rx="2" fill="#7f96ad"/>
+      <rect x="12" y="18" width="12" height="82" fill="#86ab8c"/>
+      <rect x="76" y="18" width="12" height="82" fill="#86ab8c"/>
+      <rect x="140" y="18" width="12" height="82" fill="#86ab8c"/>
+      <rect x="204" y="18" width="12" height="82" fill="#86ab8c"/>
+      <rect x="268" y="18" width="12" height="82" fill="#86ab8c"/>
+      <rect x="336" y="18" width="12" height="82" fill="#86ab8c"/>
+      <rect x="24" y="46" width="52" height="10" fill="#d9a05e"/>
+      <rect x="152" y="46" width="52" height="10" fill="#d9a05e"/>
+      <rect x="280" y="46" width="56" height="10" fill="#d9a05e"/>
+      <rect x="88" y="68" width="52" height="10" fill="#d9a05e"/>
+      <rect x="216" y="68" width="52" height="10" fill="#d9a05e"/>
+      <g style="font:500 10px 'IBM Plex Mono',monospace" fill="var(--ink2)">
+        <rect x="12" y="122" width="8" height="8" fill="#7f96ad"/><text x="25" y="130">top &amp; bottom</text>
+        <rect x="128" y="122" width="8" height="8" fill="#86ab8c"/><text x="141" y="130">uprights</text>
+        <rect x="216" y="122" width="8" height="8" fill="#d9a05e"/><text x="229" y="130">crosspieces</text>
+      </g>
+    </svg>
+  </div>
+
+  <section class="cut">
+    <h3>Long walls · <span class="mono">“Wall” / “Wall 2”</span> <span class="dim mono">5035 × 2490 × 90</span></h3>
+    <table class="mono">
+      <tr><td><span class="dot dA"></span>Top &amp; bottom planks × 2</td><td>5035 × 35 — one along the top, one along the bottom</td></tr>
+      <tr><td><span class="dot dB"></span>Upright planks × 10</td><td>36 wide, cut 2420 long, standing between the top &amp; bottom planks — left edges at 0, 591, 1182, 1773, 2382, 2982, 3582, 4182, 4782, 4999</td></tr>
+      <tr><td><span class="dot dC"></span>Short crosspieces × 23</td><td>sit horizontally between the uprights to stop them bowing — 5 staggered rows, 478 / 877 / 1268 / 1755 / 2059 down from the top; lengths 555 / 564 / 573 (one 181 in the narrow end gap)</td></tr>
+      <tr><td>Doorway (Wall B only)</td><td>rough opening 890 wide × 2107 tall, right of centre (3018–3908) — fits a standard Australian 2040 × 820 door. Changes: the upright at 3582 is cut to a 313 piece above the door; a new full upright goes in at 3908; a 890 × 35 piece caps the opening; the bottom plank is left out across the opening; 3 crosspieces in that zone are dropped and 3 shortened to 238</td></tr>
+      <tr><td>Door frame (jamb)</td><td>30-thick surround the door hangs in — two 2070 legs + an 820 head piece, packed off the framing with plastic packers (5 each side, ~37 above) and screwed through the packers into the uprights. Easiest bought as a pre-hung door + frame set</td></tr>
+      <tr><td>Wall A</td><td>as drawn, no door</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
+    <h3>End walls · <span class="mono">“front wall” / “back wall”</span> <span class="dim mono">3320 × 2490 × 90</span></h3>
+    <table class="mono">
+      <tr><td>Sized to fit</td><td>cut 90 narrower on each side than the Figma drawing, so they slot between the two long walls</td></tr>
+      <tr><td><span class="dot dA"></span>Top &amp; bottom planks × 2</td><td>3320 × 35</td></tr>
+      <tr><td><span class="dot dB"></span>Upright planks × 7</td><td>36 wide × 2420 — at 0, 501, 1092, 1692, 2292, 2833, 3284</td></tr>
+      <tr><td><span class="dot dC"></span>Short crosspieces × 15</td><td>5 staggered rows at 492 / 825 / 1282 / 1703 / 2072 — lengths 465 / 505 / 555 / 564 / 415</td></tr>
+      <tr><td>Both walls</td><td>identical</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
+    <h3>Floor deck · <span class="mono">labeled “Wall 2”</span> <span class="dim mono">5035 × 3500 × 90</span></h3>
+    <table class="mono">
+      <tr><td>Sized to fit</td><td>the Figma drawing is 35 too deep — trimmed to the 3500 footprint</td></tr>
+      <tr><td><span class="dot dA"></span>Border planks × 4</td><td>two sides 35 × 3500 (at 0 and 5000), two ends 4965 × 35 between them (at 0 and 3465)</td></tr>
+      <tr><td><span class="dot dA"></span>Middle plank</td><td>4965 × 35, across the deck at 1535</td></tr>
+      <tr><td><span class="dot dB"></span>Deck planks × 20</td><td>the long planks your floor boards sit on, spaced 455 apart — ten cut 1500 (front half), ten cut 1895 (back half)</td></tr>
+      <tr><td><span class="dot dR"></span>Add: support row</td><td>11 short offcut pieces (10 × 420 + 1 × 415) between the deck planks, staggered either side of the 2500 line — the stagger means every piece can be nailed straight through the planks into its ends. Makes a fourth support line, with 7 feet under it. Shown red in the 3D model and the 2D net</td></tr>
+      <tr><td>Note in file</td><td>“3500”</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
+    <h3>Roof · <span class="mono">“Roof” (updated)</span> <span class="dim mono">5035 × 3500 × 90</span></h3>
+    <table class="mono">
+      <tr><td>Sized to fit</td><td>the Figma drawing is 35 too deep — one border plank pulled in flush to 3500</td></tr>
+      <tr><td><span class="dot dA"></span>Border planks × 4</td><td>each runs past the next, windmill style — 35 × 3465 · 5000 × 35 · 35 × 3430 · 5035 × 35</td></tr>
+      <tr><td><span class="dot dB"></span>Cross planks × 4</td><td>35 × 3430, running the short way across the roof — at 920, 1840, 2760, 3897</td></tr>
+      <tr><td><span class="dot dC"></span>Short crosspieces × 5</td><td>a stiffening row halfway across (at 1732) — lengths 885 / 885 / 885 / 1102 / 1068</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
+    <h3>OSB lining · interior <span class="dim mono">sheets 2745 × 1200 × 12</span></h3>
+    <table class="mono">
+      <tr><td>Join check</td><td>the sheet joins at 1200 / 2400 / 3600 / 4800 land dead-centre on the upright planks — the layout works ✓</td></tr>
+      <tr><td>Wall A</td><td>1 sheet cut to 1110 wide + 3 full sheets + a 145 strip, corner to corner (4855) — the corner sheet loses 90 to the wall it meets; the joins stay on the uprights</td></tr>
+      <tr><td>Wall B (door wall)</td><td>same, but the two sheets at the door are cut to 618 and 892 around the opening, plus a strip above the door (join it over the short upright at 3460 — it can come from the offcuts)</td></tr>
+      <tr><td>End walls (each)</td><td>a 1098 cut + 1 full sheet + a 998 cut, fitting between the long-wall boards (3296)</td></tr>
+      <tr><td>Height</td><td>one sheet covers the wall — cut 2745 down to 2478 (stops under the ceiling boards)</td></tr>
+      <tr><td>Ceiling</td><td>2 columns (2655 / 2200) × 3 rows (1110 / 1200 / 1010)</td></tr>
+      <tr><td>Buy</td><td>20 sheets of 2745 × 1200 — cutting layout in the 2D net view (the two 145 rips share sheets with the two 998 rips)</td></tr>
+      <tr><td>Ceiling flag</td><td>the ceiling joins matched an older roof drawing; the current cross planks miss them — the 2745 join is 15 off the third cross plank, and the 1200 / 2400 joins have nothing behind them (the stiffening row sits at 1732). Move that row to two rows at 1200 and 2400, or add battens</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
+    <h3>Feet · adjustable pedestals <span class="dim mono">h 25–55 · deck at +55</span></h3>
+    <div class="mini">
+      <svg viewBox="0 0 360 118" role="img" aria-label="Diagram of one foot: rubber square on the concrete, screw-adjustable foot, floor frame plank on top">
+        <rect x="100" y="8" width="160" height="26" rx="2" fill="#86ab8c"/>
+        <rect x="150" y="34" width="60" height="8" fill="#2b2e31"/>
+        <rect x="168" y="42" width="24" height="32" fill="#2b2e31"/>
+        <rect x="145" y="74" width="70" height="8" fill="#2b2e31"/>
+        <rect x="140" y="82" width="80" height="6" fill="#55585e"/>
+        <rect x="0" y="88" width="360" height="12" fill="#6f7277"/>
+        <g style="font:500 10px 'IBM Plex Mono',monospace" fill="var(--ink2)">
+          <text x="12" y="26">floor frame</text>
+          <text x="232" y="60">adjustable foot</text>
+          <text x="232" y="88">rubber square</text>
+          <text x="12" y="114">concrete floor</text>
+        </g>
+      </svg>
+    </div>
+    <table class="mono">
+      <tr><td>Products</td><td><a href="https://www.bunnings.com.au/builders-edge-25-40mm-minifoot-pedestal-feet_p2450073" target="_blank" rel="noopener" style="color:var(--accent)">Builders Edge Minifoot 25–40</a> over the crown zone + <a href="https://www.bunnings.com.au/builders-edge-pedestal-foot-smallfoot-35-60mm_p2450074" target="_blank" rel="noopener" style="color:var(--accent)">Smallfoot 35–60</a> at the low ends — screw-adjustable, &gt;200 kg each, fastened to the deck rails; a 100 × 100 square of <a href="https://www.bunnings.com.au/jack-100mm-x-1m-anti-vibration-pad_p3961983" target="_blank" rel="noopener" style="color:var(--accent)">Jack 4 rubber</a> under every base decouples it from the slab</td></tr>
+      <tr><td>Layout</td><td>28 spread along the deck’s four support lines (about 840 apart) + 4 extra under the piano corner, front-left</td></tr>
+      <tr><td>Piano check</td><td>~300 kg upright piano at the front-left wall — with the extra feet, the busiest foot carries under ≈150 kg vs its 200 kg+ rating</td></tr>
+      <tr><td>Levelling</td><td>wind each foot up or down to a laser line — the deck ends up dead level at +55 (the shortest foot is 25, riding the floor’s high spot)</td></tr>
+      <tr><td>Buy</td><td>32 feet (≈$295) + 4 rubber rolls (each roll cuts into 10 squares → 32 needed, 8 spare)</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
+    <h3>Slab · warehouse floor <span class="dim mono">crown +30</span></h3>
+    <table class="mono">
+      <tr><td>Survey</td><td>not level — rises about 30 to a high spot 3377 from the tall wall (about 2⁄3 of the way along the studio), then falls about 30 to the far wall</td></tr>
+      <tr><td>Shown</td><td>true-scale surface tinted by height (purple = high)</td></tr>
+      <tr><td>Consequence</td><td>handled — the deck is levelled on the adjustable feet above, clear of the high spot</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
+    <h3>Outer room · warehouse <span class="dim mono">7000 × 7000</span></h3>
+    <table class="mono">
+      <tr><td>Ceiling</td><td>3050 at the tall wall, sloping down 280 over the studio’s 5035 length (about 3.2°, the slope from your sketch) and continuing — about 2661 at the far wall (calculated)</td></tr>
+      <tr><td>Studio placement</td><td>tucked into the corner — 20 gap to the tall wall and 20 to the side wall</td></tr>
+      <tr><td>Headroom check</td><td>studio top is 2725 on its feet; the ceiling is ≈2769 over its far corner — ≈44 clearance (the levelling used 55 of the 100 budget)</td></tr>
+      <tr><td>Shell</td><td>drawn 100 thick for context — not a build item</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
+    <h3>Assembled</h3>
+    <table class="mono">
+      <tr><td>Room outer</td><td>5035 × 3500 × 2670 (floor 90 + walls 2490 + roof 90) — on 32 adjustable feet, deck at +55, roof tops out at 2725 above slab datum</td></tr>
+      <tr><td>Clear inside</td><td>4855 × 3320 × 2490</td></tr>
+      <tr><td>Height budget</td><td>upright planks are 2420 = 2770 − two 35 planks − 90 floor − 90 roof − 100 spare; inside height after boards ≈ 2396 per your calc</td></tr>
+      <tr><td>How it stacks</td><td>floor, walls and roof all share the same 5035 × 3500 outline — every joint sits flush, nothing overlaps</td></tr>
+      <tr><td>Stock</td><td>plank 35 × 90</td></tr>
+    </table>
+  </section>
+
+  <div class="flags">
+    <p class="flag"><b>Walls built the way they’ll be screwed together.</b> Height set to 2490 from the warehouse budget (uprights cut 2420). The Figma net draws the uprights full-height with the horizontal planks laid over them; here the uprights sit between full-width top &amp; bottom planks, and the short crosspieces are cut to the exact gaps. Floor and roof sandwich the walls — nothing overlaps anywhere.</p>
+    <p class="flag"><b>End walls cut down from the drawing.</b> The file draws them 3500 wide, which crashes into the long walls at the corners; here they are cut to 3320 (90 off each side) and slot between the long walls. The middle uprights keep their drawn spacing; new edge uprights sit on the cut lines.</p>
+    <p class="flag"><b>Two panels are labeled with the wrong size.</b> The planked deck is labeled “Wall 2: 5035 × 2700” and the roof “5035 × 2700”, but both are drawn ≈3500 deep — exactly matching the end walls. They are modeled as the floor and roof of the room.</p>
+    <p class="flag"><b>Deck and roof trimmed flush.</b> The net draws both 35 (one plank width) too deep. Both are cut to exactly 5035 × 3500: the deck’s long planks shorten to 1895 and its offset border planks are pulled into line; the roof keeps its windmill corners with one border plank pulled in, cross planks cut 3430, and the stiffening row cut to the exact gaps.</p>
+  </div>
+</aside>
+
+<script>
+(() => {
+'use strict';
+const stage = document.getElementById('stage');
+const bgc = document.getElementById('bg'), glc = document.getElementById('glc'), ovc = document.getElementById('ov');
+const bg = bgc.getContext('2d'), ov = ovc.getContext('2d');
+const gl = glc.getContext('webgl', {antialias:true, alpha:true});
+
+/* ---------- exact geometry from Figma (mm, 1px = 1mm) ---------- */
+const L = 5035, W = 3500, H = 2490, T = 90;   // room + plank depth; walls 35+2420+35
+const LIFT = 55;                               // studio levelled on pedestal feet, deck underside at +55
+const slabH = x => {                           // warehouse slab profile: crown +30 at 3357
+  const X0=-20, X1=6980, PK=3357, AMP=30;
+  return x <= PK ? AMP*(1-Math.cos(Math.PI*(x-X0)/(PK-X0)))/2
+                 : AMP*(1-Math.cos(Math.PI*(X1-x)/(X1-PK)))/2;
+};
+const FLOOR_TOP = LIFT + T, WALL_TOP = FLOOR_TOP + H; // 140, 2630
+const RED = [214, 69, 65];
+
+/* ---------- solid builders ---------- */
+function hexa(c){
+  const faces = [[0,3,2,1],[4,5,6,7],[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7]];
+  const cx = c.reduce((s,p)=>s+p[0],0)/8, cy = c.reduce((s,p)=>s+p[1],0)/8, cz = c.reduce((s,p)=>s+p[2],0)/8;
+  return faces.map(idx => {
+    const p = idx.map(i => c[i]);
+    const u = [p[1][0]-p[0][0], p[1][1]-p[0][1], p[1][2]-p[0][2]];
+    const v = [p[2][0]-p[0][0], p[2][1]-p[0][1], p[2][2]-p[0][2]];
+    let n = [u[1]*v[2]-u[2]*v[1], u[2]*v[0]-u[0]*v[2], u[0]*v[1]-u[1]*v[0]];
+    const len = Math.hypot(...n) || 1; n = n.map(x=>x/len);
+    const fx = p.reduce((s,q)=>s+q[0],0)/4, fy = p.reduce((s,q)=>s+q[1],0)/4, fz = p.reduce((s,q)=>s+q[2],0)/4;
+    if (n[0]*(fx-cx)+n[1]*(fy-cy)+n[2]*(fz-cz) < 0) n = n.map(x=>-x);
+    return {pts:p, n};
+  });
+}
+const box = (x0,x1,y0,y1,z0,z1) => hexa([
+  [x0,y0,z0],[x1,y0,z0],[x1,y0,z1],[x0,y0,z1],
+  [x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1]]);
+const prismZ = (sec, z0, z1) => hexa([...sec.map(p=>[p[0],p[1],z0]), ...sec.map(p=>[p[0],p[1],z1])]);
+const E = 0.8;   // inset tiers for the as-drawn floor/roof overlaps
+const S = 0.15;  // assembly clearance on every wall member (butt joints never share a face)
+const wbox = (x0,x1,y0,y1,z0,z1) => box(x0+S,x1-S, y0+S,y1-S, z0+S,z1-S);
+
+/* ---------- panel member layouts (panel-local mm) ---------- */
+/* walls rebuilt as assembled (no member overlaps):
+   full-width plates top & bottom, studs 2580 cut between them,
+   noggings snapped to exact bay lengths between stud faces */
+const longWallMembers = (() => {
+  const m = [];
+  m.push([0,0,5035,35]); m.push([0,2455,5035,35]);            // plates
+  for (const x of [0,591,1182,1773,2382,2982,3582,4182,4782,4999]) m.push([x,35,36,2420]);
+  const rowA = [[36,555],[1218,555],[2418,564],[3618,564],[4818,181]];
+  const rowB = [[627,555],[1809,573],[3018,564],[4218,564]];
+  for (const [x,w] of rowA) { m.push([x,478,w,36]); m.push([x,1268,w,36]); m.push([x,2059,w,36]); }
+  for (const [x,w] of rowB) { m.push([x,877,w,36]); m.push([x,1755,w,36]); }
+  return m;
+})();
+/* Wall B = Wall A plus a doorway right of centre: rough opening 890 × 2107
+   (fits a standard Australian 2040 × 820 door). The upright at 3582 becomes a
+   short piece above the header; a new upright goes in at 3908; the bottom
+   plank is cut out across the opening. */
+const wallBMembers = (() => {
+  const m = [];
+  m.push([0,0,5035,35]);                                     // top plank
+  m.push([0,2455,3018,35]); m.push([3908,2455,1127,35]);     // bottom plank, cut at the door
+  for (const x of [0,591,1182,1773,2382,2982,4182,4782,4999]) m.push([x,35,36,2420]);
+  m.push([3908,35,36,2420]);                                 // new door-side upright
+  m.push([3582,35,36,313]);                                  // old upright, kept above the header
+  m.push([3018,348,890,35]);                                 // header over the opening
+  for (const y of [478,1268,2059])
+    for (const [x,w] of [[36,555],[1218,555],[2418,564],[3944,238],[4818,181]]) m.push([x,y,w,36]);
+  for (const y of [877,1755])
+    for (const [x,w] of [[627,555],[1809,573],[4218,564]]) m.push([x,y,w,36]);
+  m.push([3053,450,820,2040, 0, 2]);                         // the door itself
+  // jamb (the frame the door hangs in): two legs + a head piece, 30 thick,
+  // packed off the structure with plastic packers
+  m.push([3023,420,30,2070, 0, 3]);                          // left jamb leg
+  m.push([3873,420,30,2070, 0, 3]);                          // right jamb leg
+  m.push([3053,420,820,30, 0, 3]);                           // head piece over the door
+  m.push([3150,383,80,37, 0, 4]); m.push([3650,383,80,37, 0, 4]);   // packers above
+  for (const y of [600,1400,2200]){
+    m.push([3018,y,5,80, 0, 4]);                             // packers, hinge side
+    m.push([3903,y,5,80, 0, 4]);                             // packers, latch side
+  }
+  return m;
+})();
+const endWallMembers = (() => {
+  // trimmed 90 each side (3500 → 3320) to fit flush between the long walls
+  const m = [];
+  m.push([0,0,3320,35]); m.push([0,2455,3320,35]);
+  for (const x of [0,501,1092,1692,2292,2833,3284]) m.push([x,35,36,2420]);
+  const rowA = [[36,465],[1128,564],[2328,505]];
+  const rowB = [[537,555],[1728,564],[2869,415]];
+  for (const [x,w] of rowA) { m.push([x,492,w,36]); m.push([x,1282,w,36]); m.push([x,2072,w,36]); }
+  for (const [x,w] of rowB) { m.push([x,825,w,36]); m.push([x,1703,w,36]); }
+  return m;
+})();
+/* deck & roof trimmed flush to the 5035 × 3500 footprint (net drew deck 3535
+   deep, roof 5070 wide); members snapped to exact butt-joint fits */
+const deckMembers = (() => {
+  const m = [];
+  m.push([0,0,35,3500]); m.push([5000,0,35,3500]);      // side edges
+  m.push([35,0,4965,35]); m.push([35,3465,4965,35]);    // end rails, cut between edges
+  m.push([35,1535,4965,35]);                            // mid rail
+  for (const x of [420,875,1330,1785,2240,2695,3150,3605,4060,4515]) m.push([x,35,35,1500]);
+  for (const x of [455,910,1365,1820,2275,2730,3185,3640,4095,4550]) m.push([x,1570,35,1895]);
+  return m;
+})();
+/* retrofit: solid blocking row at 2500 between the planks (offcuts, screwed
+   into the built frame) — becomes a fourth bearing line with feet under it,
+   halving the worst plank span. Shown red = pieces to add. */
+const deckBlocking = (() => {
+  // staggered either side of the 2500 line so every piece can be nailed
+  // straight through the deck planks into its ends
+  const xs = [35,490,945,1400,1855,2310,2765,3220,3675,4130,4585];
+  return xs.map((x,i) => [x, i%2 ? 2517 : 2447, x===4585 ? 415 : 420, 35, 0, 1]);
+})();
+/* updated roof (net node 28:734): pinwheel corners — left edge full height,
+   top rail over the right edge's head, bottom rail full width; net draws it
+   3535 deep so the bottom rail is pulled in flush to the 3500 line */
+const roofMembers = [
+  [0,0,35,3465],                                        // left edge
+  [35,0,5000,35],                                       // top rail
+  [5000,35,35,3430],                                    // right edge
+  [0,3465,5035,35],                                     // bottom rail, full width
+  [920,35,35,3430], [1840,35,35,3430], [2760,35,35,3430], [3897,35,35,3430],
+  [35,1732,885,35], [955,1732,885,35], [1875,1732,885,35],
+  [2795,1732,1102,35], [3932,1732,1068,35],
+];
+
+function buildPanel(members, map){
+  const out = [];
+  for (const [mx,my,w,h,tier,red] of members){
+    const ins = (tier||0) * E;
+    const faces = map(mx,my,w,h,ins);
+    if (red === 2){ for (const f of faces) f.col = [122,92,64]; }      // door leaf
+    else if (red === 3){ for (const f of faces) f.col = [156,124,88]; } // door jamb
+    else if (red === 4){ for (const f of faces) f.col = [214,178,88]; } // packers
+    else if (red) for (const f of faces) f.red = true;
+    out.push(...faces);
+  }
+  return out;
+}
+const wallY = (my,h) => [WALL_TOP-(my+h), WALL_TOP-my]; // panel y=0 is the top plate
+
+const panels = [
+  {id:'floor', label:'Floor deck', color:'#6d7276', on:true,
+   faces:buildPanel([...deckMembers, ...deckBlocking], (mx,my,w,h)=> box(mx+S,mx+w-S, LIFT+S,LIFT+T-S, my+S,my+h-S)),
+   tag:{p:[L/2,LIFT+T,W/2], t:'5035 × 3500'}},
+  {id:'wallA', label:'Wall A', color:'#b9bec3', on:true,
+   faces:buildPanel(longWallMembers, (mx,my,w,h)=>{ const [y0,y1]=wallY(my,h); return wbox(mx,mx+w, y0,y1, 0,T); }),
+   tag:{p:[L/2,1500,0], t:'5035 × 2490'}},
+  {id:'wallB', label:'Wall B', color:'#aeb3b8', on:true,
+   faces:buildPanel(wallBMembers, (mx,my,w,h)=>{ const [y0,y1]=wallY(my,h); return wbox(mx,mx+w, y0,y1, W-T,W); }),
+   tag:{p:[L/2,1500,W], t:'5035 × 2490 · door'}},
+  {id:'front', label:'Front wall', color:'#a3a8ad', on:true,
+   faces:buildPanel(endWallMembers, (mx,my,w,h)=>{ const [y0,y1]=wallY(my,h); return wbox(0,T, y0,y1, T+mx,T+mx+w); }),
+   tag:{p:[0,1500,W/2], t:'3320 × 2490'}},
+  {id:'back', label:'Back wall', color:'#9aa0a5', on:true,
+   faces:buildPanel(endWallMembers, (mx,my,w,h)=>{ const [y0,y1]=wallY(my,h); return wbox(L-T,L, y0,y1, T+mx,T+mx+w); }),
+   tag:{p:[L,1500,W/2], t:'3320 × 2490'}},
+  {id:'roof', label:'Roof', color:'#c8ccd0', on:true,
+   faces:buildPanel(roofMembers, (mx,my,w,h)=> box(mx+S,mx+w-S, WALL_TOP+S,WALL_TOP+T-S, my+S,my+h-S)),
+   tag:{p:[L/2,WALL_TOP+T,W/2], t:'5035 × 3500'}},
+  /* OSB lining: 2745 × 1200 sheets, 12 thick, on the interior faces.
+     Seams at 1200/2400/3600/4800 land dead-center on the studs (as planned in
+     the net); corner sheets are ripped where walls meet. Wall sheets stop at
+     2728 under the 12 ceiling lining. */
+  (() => {
+    const OT2 = 12, Y0 = FLOOR_TOP, Y1 = WALL_TOP - OT2;
+    const xsLong = [[90,1110],[1200,1200],[2400,1200],[3600,1200],[4800,145]];   // long walls, corner to corner
+    const zsEnd  = [[102,1098],[1200,1200],[2400,998]];                          // end walls, butted between linings
+    const cols = [[90,2655],[2745,2200]], rows = [[90,1110],[1200,1200],[2400,1010]];
+    const faces = [];
+    for (const [x,w] of xsLong)
+      faces.push(...box(x+S,x+w-S, Y0+S,Y1-S, T+S,T+OT2-S));
+    // Wall B lining is cut around the doorway, with a strip above the door
+    const xsB = [[90,1110],[1200,1200],[2400,618],[3018,890,FLOOR_TOP+2107],[3908,892],[4800,145]];
+    for (const [x,w,y0] of xsB)
+      faces.push(...box(x+S,x+w-S, (y0||Y0)+S,Y1-S, W-T-OT2+S,W-T-S));
+    for (const [z,w] of zsEnd){
+      faces.push(...box(T+S,T+OT2-S, Y0+S,Y1-S, z+S,z+w-S));
+      faces.push(...box(L-T-OT2+S,L-T-S, Y0+S,Y1-S, z+S,z+w-S));
+    }
+    for (const [cx,cw] of cols) for (const [cz,cw2] of rows)
+      faces.push(...box(cx+S,cx+cw-S, WALL_TOP-OT2+S,WALL_TOP-S, cz+S,cz+cw2-S));
+    return {id:'osb', label:'OSB lining', color:'#c9a25e', on:true, faces,
+      alpha:0.38, lineTint:[0.52,0.38,0.16,0.95],
+      tag:null};
+  })(),
+  /* scale figure: a 1905-tall person at the center of the room — a flat
+     architectural-cutout silhouette (60 thick), authored to scale */
+  (() => {
+    const cx = 90 + 4855/2, cz = 90 + 3320/2, b = FLOOR_TOP;
+    // right-hand outline from crown down outer side to foot, in to the crotch
+    const R = [
+      [0,1905],[64,1878],[96,1806],[88,1726],[56,1678],[40,1648],[42,1618],
+      [120,1595],[196,1560],[236,1525],[258,1430],[268,1290],[264,1150],[252,1072],[214,1068],
+      [206,1160],[202,1300],[192,1440],[158,1488],
+      [168,1330],[162,1180],[176,1050],[170,890],[152,690],[142,490],[136,290],[130,110],
+      [178,36],[182,0],[64,0],[58,120],[50,320],[38,520],[26,720],[14,900],[0,975],
+    ];
+    const P = [...R];
+    for (let i=R.length-2;i>=1;i--) P.push([-R[i][0], R[i][1]]);
+    // ear-clip triangulation
+    function earClip(pts){
+      const idx=[...Array(pts.length).keys()], tris=[];
+      let area=0; for(let i=0;i<pts.length;i++){const a=pts[i],c=pts[(i+1)%pts.length]; area+=a[0]*c[1]-c[0]*a[1];}
+      const ccw = area>0;
+      const cross=(a,c,p)=>(c[0]-a[0])*(p[1]-a[1])-(c[1]-a[1])*(p[0]-a[0]);
+      const inTri=(p,a,c,d)=>{
+        const d1=cross(a,c,p),d2=cross(c,d,p),d3=cross(d,a,p);
+        return !(((d1<0)||(d2<0)||(d3<0)) && ((d1>0)||(d2>0)||(d3>0)));
+      };
+      let guard=0;
+      while(idx.length>3 && guard++<3000){
+        let clipped=false;
+        for(let i=0;i<idx.length;i++){
+          const ia=idx[(i-1+idx.length)%idx.length], ib=idx[i], ic=idx[(i+1)%idx.length];
+          const a=pts[ia],c=pts[ib],d=pts[ic];
+          const cr=cross(a,c,d);
+          if (ccw ? cr<=0 : cr>=0) continue;
+          let ok=true;
+          for(const j of idx){ if(j===ia||j===ib||j===ic) continue;
+            if(inTri(pts[j],a,c,d)){ok=false;break;} }
+          if(!ok) continue;
+          tris.push([ia,ib,ic]); idx.splice(i,1); clipped=true; break;
+        }
+        if(!clipped) break;
+      }
+      if(idx.length===3) tris.push([idx[0],idx[1],idx[2]]);
+      return tris;
+    }
+    const zf = cz+30, zb = cz-30, faces = [];
+    for (const [i,j,k] of earClip(P)){
+      const t = [P[i],P[j],P[k]];
+      faces.push({pts:t.map(p=>[cx+p[0], b+p[1], zf]), n:[0,0,1], noline:true});
+      faces.push({pts:t.map(p=>[cx+p[0], b+p[1], zb]), n:[0,0,-1], noline:true});
+    }
+    for (let i=0;i<P.length;i++){
+      const a=P[i], c=P[(i+1)%P.length];
+      let n=[c[1]-a[1], -(c[0]-a[0]), 0];
+      const len=Math.hypot(...n)||1; n=n.map(v=>v/len);
+      faces.push({pts:[[cx+a[0],b+a[1],zb],[cx+c[0],b+c[1],zb],[cx+c[0],b+c[1],zf],[cx+a[0],b+a[1],zf]], n});
+    }
+    return {id:'man', label:'Person + piano', color:'#161819', on:true, faces,
+      tag:{p:[cx, b+1990, cz], t:'1905'}};
+  })(),
+  /* slab: the warehouse floor is not level — it rises ≈30 from the tall wall
+     to a crown ≈3357 along the studio (2/3 of its length), then falls ≈30 to
+     the far wall. True-scale geometry, tinted by elevation (amber = high). */
+  (() => {
+    const X0=-20, X1=6980, Z0=-20, Z1=6980, PK=3357, AMP=30;
+    const h = slabH;
+    const lo=[125,128,131], hi=[149,131,186];
+    const faces = [];
+    const NXS = 36;
+    for (let i=0;i<NXS;i++){
+      const xa = X0 + (X1-X0)*i/NXS, xb = X0 + (X1-X0)*(i+1)/NXS;
+      const ha = h(xa), hb = h(xb);
+      let n = [-(hb-ha)*(Z1-Z0), (xb-xa)*(Z1-Z0), 0];
+      const len = Math.hypot(...n)||1; n = n.map(v=>v/len);
+      if (n[1] < 0) n = n.map(v=>-v);
+      const t = ((ha+hb)/2)/AMP;
+      faces.push({pts:[[xa,ha,Z0],[xb,hb,Z0],[xb,hb,Z1],[xa,ha,Z1]], n,
+        col: lo.map((v,k)=> v + (hi[k]-v)*t)});
+    }
+    return {id:'slab', label:'Slab bump', color:'#7d8083', on:true, faces,
+      tag:{p:[PK, 140, 3480], t:'crown +30'}};
+  })(),
+  /* feet: Builders Edge adjustable pedestal feet (Minifoot 25–40 over the
+     crown, Smallfoot 35–60 at the low ends) on a Jack 4 rubber square,
+     levelling the deck at +55. 21 on the rail grid + 4 extra under the
+     piano corner (front-left against Wall B). */
+  (() => {
+    const spots = [];
+    for (const sx of [100, 940, 1780, 2620, 3460, 4300, 4935])
+      for (const sz of [50, 1552, 2500, 3450]) spots.push([sx, sz]); // incl. the new blocking line
+    spots.push([520, 3450], [1360, 3450], [472, 2780], [1382, 2780]); // piano zone
+    const faces = [];
+    for (const [sx, sz] of spots){
+      const g = slabH(sx);
+      const rub = box(sx-50,sx+50, g,g+4, sz-50,sz+50);
+      for (const f of rub) f.col = [52,54,58];
+      faces.push(...rub);                                              // rubber pad
+      faces.push(...box(sx-40,sx+40, g+4,g+12, sz-40,sz+40));          // base plate
+      faces.push(...box(sx-18,sx+18, g+12,LIFT-8, sz-18,sz+18));       // screw column
+      faces.push(...box(sx-30,sx+30, LIFT-8,LIFT, sz-30,sz+30));       // top plate
+    }
+    return {id:'stoppers', label:'Feet', color:'#1c1e20', on:true, faces,
+      tag:{p:[L/2, 20, -300], t:'32 feet · h 25–55'}};
+  })(),
+  /* piano: ~300 kg upright, front-left against Wall B — the reason for the
+     extra feet in that corner */
+  {id:'piano', label:'Piano spot', color:'#8a4750', alpha:0.35, on:true, noChip:true,
+   faces:box(300,1800, 145,1395, 2790,3390),
+   tag:{p:[1050, 1470, 3090], t:'piano · ~300 kg'}},
+  /* outer room: the warehouse — 7000 × 7000 inside. Studio tucked into the
+     corner with a 20 gap on both sides. Ceiling: 3050 at the tall wall, falling
+     280 over the studio's 5035 stretch (pitch 280/5035) and continuing to
+     ≈2661 at the far end. */
+  (() => {
+    const OX0=-20, OX1=6980, OZ0=-20, OZ1=6980, OT=100;
+    const oh = x => 3050 - 280*(x-OX0)/5035;
+    const H1 = oh(OX1); // ≈2661 at the far wall (calculated)
+    const sideSec = [[OX0,0],[OX1,0],[OX1,H1],[OX0,3050]];
+    return {id:'outer', label:'Outer room', color:'#7d90a3', alpha:0.08, on:true,
+      faces:[
+        ...box(OX0-OT,OX0, 0,3050, OZ0-OT,OZ1+OT),   // tall end wall
+        ...box(OX1,OX1+OT, 0,H1, OZ0-OT,OZ1+OT),     // short end wall
+        ...prismZ(sideSec, OZ0-OT,OZ0),               // side walls, raked tops
+        ...prismZ(sideSec, OZ1,OZ1+OT),
+        ...prismZ([[OX0-OT,oh(OX0-OT)],[OX1+OT,oh(OX1+OT)],[OX1+OT,oh(OX1+OT)+OT],[OX0-OT,oh(OX0-OT)+OT]], OZ0-OT,OZ1+OT), // slanted roof
+      ],
+      tag:null};
+  })(),
+];
+for (const p of panels) for (const f of p.faces) f.panel = p;
+
+/* ---------- 2D net view: every panel laid flat on the floor ---------- */
+const flatWall = (members, ox, oz) => buildPanel(members, (mx,my,w,h)=> wbox(ox+mx,ox+mx+w, 0,T, oz+my,oz+my+h));
+const flatDeck = (members, ox, oz) => buildPanel(members, (mx,my,w,h)=> box(ox+mx+S,ox+mx+w-S, S,T-S, oz+my+S,oz+my+h-S));
+{
+  const lay = {
+    floor:{f:()=>flatDeck([...deckMembers, ...deckBlocking],0,0), tag:[2517,1750], t:'Floor deck · 5035 × 3500'},
+    roof: {f:()=>flatDeck(roofMembers,0,4200),    tag:[2517,5950],  t:'Roof · 5035 × 3500'},
+    wallA:{f:()=>flatWall(longWallMembers,5835,0),   tag:[8352,1245],  t:'Wall A · 5035 × 2490'},
+    wallB:{f:()=>flatWall(wallBMembers,5835,3350),tag:[8352,4595],  t:'Wall B · 5035 × 2490 · door'},
+    front:{f:()=>flatWall(endWallMembers,5835,6700), tag:[7495,7945],  t:'Front · 3320 × 2490'},
+    back: {f:()=>flatWall(endWallMembers,9755,6700), tag:[11415,7945], t:'Back · 3320 × 2490'},
+  };
+  for (const p of panels){
+    const s = lay[p.id]; if (!s) continue;
+    p.flatFaces = s.f();
+    for (const f of p.flatFaces) f.panel = p;
+    p.flatTag = {p:[s.tag[0], T, s.tag[1]], t:s.t};
+  }
+  panels.find(p=>p.id==='floor').flatTags = [{p:[2517, 30, 3800], t:'red = support row to add @ 2500'}];
+  /* OSB buying layout: every piece inside its full 2745 × 1200 sheet, gapped.
+     20 sheets — the two 145 rips share sheets with the two 998 rips. */
+  const wallPc = w => ({pieces:[[w,2478]], t:w+' × 2478'});
+  const shared = () => ({pieces:[[145,2478],[998,2478]], t:'145 + 998 × 2478'});
+  const ceilPc = (pw,pl) => ({pieces:[[pw,pl]], t:pl+' × '+pw});
+  const OSB_SHEETS = [
+    wallPc(1110), wallPc(1200), wallPc(1200), wallPc(1200),          // wall A
+    wallPc(1110), wallPc(1200), wallPc(618), wallPc(892),            // wall B (door wall)
+    wallPc(1098), wallPc(1200),                                      // front
+    wallPc(1098), wallPc(1200),                                      // back
+    shared(), shared(),                                              // 145 + 998 rips
+    ceilPc(1110,2655), ceilPc(1200,2655), ceilPc(1010,2655),         // ceiling col 1
+    ceilPc(1110,2200), ceilPc(1200,2200), ceilPc(1010,2200),         // ceiling col 2
+  ];
+  {
+    const osbP = panels.find(p=>p.id==='osb');
+    const faces = [], tags = [];
+    OSB_SHEETS.forEach((s,i) => {
+      const cx2 = i % 10, row = Math.floor(i/10);
+      const ox = cx2*1350, oz = 10100 + row*3050;
+      const outer = box(ox+1, ox+1199, 0, 5, oz+1, oz+2744);
+      for (const f of outer) f.col = [150,145,128];
+      faces.push(...outer);
+      let px = ox;
+      for (const [pw,pl] of s.pieces){
+        faces.push(...box(px+4, px+pw-4, 5, 20, oz+4, oz+pl-4));
+        px += pw + 55;
+      }
+      tags.push({p:[ox+600, 30, oz+1372], t:s.t});
+    });
+    osbP.flatFaces = faces;
+    for (const f of faces) f.panel = osbP;
+    osbP.flatTags = tags;
+    osbP.flatTag = {p:[6600, 40, 9750], t:'OSB · 20 sheets of 2745 × 1200'};
+  }
+}
+const netDims = [
+  {a:[0,0,3500], b:[5035,0,3500], off:[0,0,320], t:'5035', need:['floor']},
+  {a:[0,0,0], b:[0,0,3500], off:[-320,0,0], t:'3500', need:['floor']},
+  {a:[0,0,7700], b:[5035,0,7700], off:[0,0,320], t:'5035', need:['roof']},
+  {a:[0,0,4200], b:[0,0,7700], off:[-320,0,0], t:'3500', need:['roof']},
+  {a:[5835,0,2490], b:[10870,0,2490], off:[0,0,320], t:'5035', need:['wallA']},
+  {a:[10870,0,0], b:[10870,0,2490], off:[320,0,0], t:'2490', need:['wallA']},
+  {a:[5835,0,5840], b:[10870,0,5840], off:[0,0,320], t:'5035', need:['wallB']},
+  {a:[10870,0,3350], b:[10870,0,5840], off:[320,0,0], t:'2490', need:['wallB']},
+  {a:[5835,0,9190], b:[9155,0,9190], off:[0,0,320], t:'3320', need:['front']},
+  {a:[5835,0,6700], b:[5835,0,9190], off:[-320,0,0], t:'2490', need:['front']},
+  {a:[9755,0,9190], b:[13075,0,9190], off:[0,0,320], t:'3320', need:['back']},
+  {a:[13075,0,6700], b:[13075,0,9190], off:[320,0,0], t:'2490', need:['back']},
+  {a:[0,0,10100], b:[1200,0,10100], off:[0,0,-300], t:'1200', need:['osb']},
+  {a:[0,0,10100], b:[0,0,12845], off:[-300,0,0], t:'2745', need:['osb']},
+  {a:[5035,0,0], b:[5035,0,2500], off:[320,0,0], t:'2500', need:['floor']},
+];
+let netMode = false, cam3d = null;
+
+/* ---------- isolate-on-click: measurements per panel ---------- */
+let isolated = null;
+const vis = p => isolated ? p.id === isolated : p.on;
+const isoDims = {
+  floor: [
+    {a:[0,LIFT,W], b:[L,LIFT,W], off:[0,0,380], t:'5035'},
+    {a:[L,LIFT,0], b:[L,LIFT,W], off:[380,0,0], t:'3500'},
+    {a:[L,LIFT,W], b:[L,LIFT+T,W], off:[240,0,240], t:'90'},
+  ],
+  stoppers: [
+    {a:[100,0,100], b:[100,LIFT,100], off:[0,0,-340], t:'55'},
+    {a:[3460,30,100], b:[3460,LIFT,100], off:[0,0,-480], t:'25'},
+    {a:[50,0,0], b:[150,0,0], off:[0,0,-620], t:'100'},
+  ],
+  roof: [
+    {a:[0,WALL_TOP+T,W], b:[L,WALL_TOP+T,W], off:[0,0,380], t:'5035'},
+    {a:[L,WALL_TOP+T,0], b:[L,WALL_TOP+T,W], off:[380,0,0], t:'3500'},
+    {a:[L,WALL_TOP,W], b:[L,WALL_TOP+T,W], off:[240,0,240], t:'90'},
+  ],
+  wallA: [
+    {a:[0,FLOOR_TOP,0], b:[L,FLOOR_TOP,0], off:[0,0,-380], t:'5035'},
+    {a:[0,FLOOR_TOP,0], b:[0,WALL_TOP,0], off:[-380,0,0], t:'2490'},
+    {a:[L,FLOOR_TOP,0], b:[L,FLOOR_TOP,T], off:[300,0,0], t:'90'},
+  ],
+  wallB: [
+    {a:[0,FLOOR_TOP,W], b:[L,FLOOR_TOP,W], off:[0,0,380], t:'5035'},
+    {a:[0,FLOOR_TOP,W], b:[0,WALL_TOP,W], off:[-380,0,0], t:'2490'},
+    {a:[L,FLOOR_TOP,W-T], b:[L,FLOOR_TOP,W], off:[300,0,0], t:'90'},
+    {a:[3053,FLOOR_TOP,W-T], b:[3873,FLOOR_TOP,W-T], off:[0,0,-320], t:'820'},
+    {a:[3873,FLOOR_TOP,W-T], b:[3873,FLOOR_TOP+2040,W-T], off:[320,0,-160], t:'2040'},
+  ],
+  front: [
+    {a:[0,FLOOR_TOP,T], b:[0,FLOOR_TOP,W-T], off:[-380,0,0], t:'3320'},
+    {a:[0,FLOOR_TOP,T], b:[0,WALL_TOP,T], off:[0,0,-380], t:'2490'},
+    {a:[0,FLOOR_TOP,T], b:[T,FLOOR_TOP,T], off:[0,0,-300], t:'90'},
+  ],
+  back: [
+    {a:[L,FLOOR_TOP,T], b:[L,FLOOR_TOP,W-T], off:[380,0,0], t:'3320'},
+    {a:[L,FLOOR_TOP,T], b:[L,WALL_TOP,T], off:[0,0,-380], t:'2490'},
+    {a:[L-T,FLOOR_TOP,T], b:[L,FLOOR_TOP,T], off:[0,0,-300], t:'90'},
+  ],
+  osb: [
+    {a:[90,FLOOR_TOP,96], b:[90,WALL_TOP-12,96], off:[-380,0,0], t:'2478'},
+    {a:[1200,FLOOR_TOP,90], b:[2400,FLOOR_TOP,90], off:[0,0,-300], t:'1200'},
+    {a:[90,FLOOR_TOP,90], b:[4945,FLOOR_TOP,90], off:[0,0,-460], t:'4855'},
+  ],
+  man: [
+    {a:[2517,FLOOR_TOP,1550], b:[2517,FLOOR_TOP+1905,1550], off:[-450,0,0], t:'1905'},
+  ],
+  slab: [
+    {a:[-20,0,6300], b:[3357,0,6300], off:[0,0,340], t:'3377'},
+    {a:[3357,0,6300], b:[6980,0,6300], off:[0,0,340], t:'3623'},
+    {a:[3357,0,-20], b:[3357,30,-20], off:[0,0,-340], t:'+30'},
+  ],
+  outer: [
+    {a:[-20,0,6980], b:[6980,0,6980], off:[0,0,560], t:'7000'},
+    {a:[6980,0,-20], b:[6980,0,6980], off:[620,0,0], t:'7000'},
+    {a:[-20,0,6980], b:[-20,3050,6980], off:[-460,0,0], t:'3050'},
+    {a:[6980,0,6980], b:[6980,2661,6980], off:[460,0,0], t:'2661'},
+  ],
+};
+
+/* ---------- dimension lines ---------- */
+const dims = [
+  {a:[0,0,W], b:[L,0,W], off:[0,0,430], t:'5035'},
+  {a:[L,0,0], b:[L,0,W], off:[460,0,0], t:'3500'},
+  {a:[0,FLOOR_TOP,W], b:[0,WALL_TOP,W], off:[-500,0,0], t:'2490', need:['wallA','wallB','front']},
+  {a:[0,FLOOR_TOP,T], b:[0,FLOOR_TOP,W-T], off:[-340,0,0], t:'3320', need:['front']},
+  {a:[L,LIFT,W], b:[L,LIFT+T,W], off:[240,0,240], t:'90'},
+  {a:[-20,0,6980], b:[6980,0,6980], off:[0,0,560], t:'7000', need:['outer']},
+  {a:[6980,0,-20], b:[6980,0,6980], off:[620,0,0], t:'7000', need:['outer']},
+  {a:[-20,0,6980], b:[-20,3050,6980], off:[-460,0,0], t:'3050', need:['outer']},
+  {a:[6980,0,6980], b:[6980,2661,6980], off:[460,0,0], t:'2661', need:['outer']},
+  {a:[5015,0,6980], b:[5015,2770,6980], off:[0,0,460], t:'2770', need:['outer']},
+];
+
+/* ---------- theme tokens ---------- */
+let tok = {};
+function readTokens(){
+  const cs = getComputedStyle(document.documentElement);
+  tok = {
+    bg: cs.getPropertyValue('--bg').trim(), ink: cs.getPropertyValue('--ink').trim(),
+    grid: cs.getPropertyValue('--grid').trim(), grid2: cs.getPropertyValue('--grid2').trim(),
+    accent: cs.getPropertyValue('--accent').trim(), pill: cs.getPropertyValue('--pill').trim(),
+    shadow: cs.getPropertyValue('--shadow').trim(), line: cs.getPropertyValue('--line').trim(),
+  };
+}
+function parseColor(str){
+  str = str.trim();
+  let m = str.match(/^#([0-9a-f]{6})$/i);
+  if (m) return [parseInt(m[1].slice(0,2),16)/255, parseInt(m[1].slice(2,4),16)/255, parseInt(m[1].slice(4,6),16)/255, 1];
+  m = str.match(/rgba?\(([^)]+)\)/);
+  if (m){ const p = m[1].split(',').map(s=>parseFloat(s)); return [p[0]/255, p[1]/255, p[2]/255, p.length>3?p[3]:1]; }
+  return [0.5,0.5,0.5,1];
+}
+try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{readTokens(); dirty=true;}); }catch(e){}
+
+/* ---------- camera ---------- */
+const center = [2900, 1400, 2500];
+let yaw = 0, pitch = 0.22, zoom = 1, D0 = 16000, F = 1050;
+let showDims = true, hoverPanel = null, dirty = true;
+let autoSpin = false; // start on the straight-on elevation view
+
+let vw=0, vh=0, dpr=1;
+function resize(){
+  dpr = Math.min(devicePixelRatio||1, 2);
+  vw = innerWidth; vh = innerHeight;
+  for (const c of [bgc, glc, ovc]){ c.width = vw*dpr; c.height = vh*dpr; }
+  bg.setTransform(dpr,0,0,dpr,0,0);
+  ov.setTransform(dpr,0,0,dpr,0,0);
+  D0 = Math.max(3900*F/(0.44*vw), 3300*F/(0.44*vh));
+  dirty = true;
+}
+addEventListener('resize', resize);
+
+let cy_, sy_, cp_, sp_, camD;
+function proj(p){
+  const x = p[0]-center[0], y = p[1]-center[1], z = p[2]-center[2];
+  const x1 = x*cy_ + z*sy_, z1 = -x*sy_ + z*cy_;
+  const y2 = y*cp_ - z1*sp_, z2 = y*sp_ + z1*cp_;
+  const w = camD - z2;
+  return [vw/2 + F*x1/w, vh/2 + 40 - F*y2/w, w];
+}
+
+/* ---------- WebGL renderer (depth-buffered — correct at any zoom) ---------- */
+const VSH = `
+attribute vec3 aPos; attribute vec3 aCol;
+uniform float uCy,uSy,uCp,uSp,uD,uFx,uFy,uOy,uA,uB,uBright;
+uniform vec3 uCenter;
+varying vec3 vCol;
+void main(){
+  vec3 v = aPos - uCenter;
+  float x1 = v.x*uCy + v.z*uSy;
+  float z1 = -v.x*uSy + v.z*uCy;
+  float y2 = v.y*uCp - z1*uSp;
+  float z2 = v.y*uSp + z1*uCp;
+  float w = uD - z2;
+  gl_Position = vec4(x1*uFx, y2*uFy - uOy*w, uA*z2 + uB, w);
+  vCol = aCol*uBright;
+}`;
+const FSH = `
+precision mediump float;
+uniform vec4 uTint;
+varying vec3 vCol;
+void main(){ gl_FragColor = vec4(vCol*uTint.rgb, uTint.a); }`;
+let prog = null, U = {}, A = {};
+function initGL(){
+  if (!gl) return;
+  const mk = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+  prog = gl.createProgram();
+  gl.attachShader(prog, mk(gl.VERTEX_SHADER, VSH));
+  gl.attachShader(prog, mk(gl.FRAGMENT_SHADER, FSH));
+  gl.linkProgram(prog); gl.useProgram(prog);
+  for (const n of ['uCy','uSy','uCp','uSp','uD','uFx','uFy','uOy','uA','uB','uBright','uCenter','uTint']) U[n] = gl.getUniformLocation(prog, n);
+  A.pos = gl.getAttribLocation(prog, 'aPos'); A.col = gl.getAttribLocation(prog, 'aCol');
+  gl.enableVertexAttribArray(A.pos); gl.enableVertexAttribArray(A.col);
+  gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  const light = [0.45, 0.82, 0.33], ll = Math.hypot(...light);
+  function pack(faces, base){
+    const tri = [], line = [];
+    for (const f of faces){
+      const sh = 0.52 + 0.48*Math.max(0,(f.n[0]*light[0]+f.n[1]*light[1]+f.n[2]*light[2])/ll);
+      const c = (f.col || (f.red ? RED : base)).map(v => Math.min(1, v*sh/255));
+      const q = f.pts;
+      const order = q.length === 3 ? [0,1,2] : [0,1,2, 0,2,3];
+      for (const idx of order) tri.push(q[idx][0],q[idx][1],q[idx][2], c[0],c[1],c[2]);
+      if (!f.noline)
+        for (let i=0;i<q.length;i++){ const a=q[i], b=q[(i+1)%q.length];
+          line.push(a[0],a[1],a[2],1,1,1, b[0],b[1],b[2],1,1,1); }
+    }
+    const triBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, triBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tri), gl.STATIC_DRAW);
+    const lineBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, lineBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(line), gl.STATIC_DRAW);
+    return {triBuf, triN: tri.length/6, lineBuf, lineN: line.length/6};
+  }
+  for (const p of panels){
+    const base = [1,3,5].map(i=>parseInt(p.color.slice(i,i+2),16));
+    p.gl3 = pack(p.faces, base);
+    if (p.flatFaces) p.glf = pack(p.flatFaces, base);
+  }
+}
+const bufsFor = p => (netMode ? p.glf : p.gl3);
+function bindDraw(buf, n, mode){
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.vertexAttribPointer(A.pos, 3, gl.FLOAT, false, 24, 0);
+  gl.vertexAttribPointer(A.col, 3, gl.FLOAT, false, 24, 12);
+  gl.drawArrays(mode, 0, n);
+}
+
+/* ---------- render ---------- */
+function render(){
+  cy_ = Math.cos(yaw); sy_ = Math.sin(yaw); cp_ = Math.cos(pitch); sp_ = Math.sin(pitch);
+  camD = D0*zoom;
+
+  /* background layer: grid + shadow */
+  bg.clearRect(0,0,vw,vh);
+  bg.lineWidth = 1;
+  const gb = netMode ? [-1000, 14500, -1000, 16500] : [-2000, 8500, -2000, 8500];
+  for (let gx=gb[0]; gx<=gb[1]; gx+=500){
+    const a = proj([gx,0,gb[2]]), b = proj([gx,0,gb[3]]);
+    bg.strokeStyle = (gx%1000===0) ? tok.grid2 : tok.grid;
+    bg.beginPath(); bg.moveTo(a[0],a[1]); bg.lineTo(b[0],b[1]); bg.stroke();
+  }
+  for (let gz=gb[2]; gz<=gb[3]; gz+=500){
+    const a = proj([gb[0],0,gz]), b = proj([gb[1],0,gz]);
+    bg.strokeStyle = (gz%1000===0) ? tok.grid2 : tok.grid;
+    bg.beginPath(); bg.moveTo(a[0],a[1]); bg.lineTo(b[0],b[1]); bg.stroke();
+  }
+  if (!netMode){
+    const outerOn = vis(panels.find(p=>p.id==='outer'));
+    const sb = outerOn ? [-240, 7200, -240, 7200] : [-140, L+140, -140, W+140];
+    const sh = [[sb[0],0,sb[2]],[sb[1],0,sb[2]],[sb[1],0,sb[3]],[sb[0],0,sb[3]]].map(proj);
+    bg.fillStyle = tok.shadow; bg.beginPath();
+    sh.forEach((p,i)=> i?bg.lineTo(p[0],p[1]):bg.moveTo(p[0],p[1]));
+    bg.closePath(); bg.fill();
+  }
+
+  /* solids: depth-buffered WebGL */
+  if (gl){
+    gl.viewport(0,0,glc.width,glc.height);
+    gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    const near = camD*0.04, far = camD*6;
+    const dA = -(far+near)/(far-near), dB = -near - dA*(camD-near);
+    gl.uniform1f(U.uCy,cy_); gl.uniform1f(U.uSy,sy_); gl.uniform1f(U.uCp,cp_); gl.uniform1f(U.uSp,sp_);
+    gl.uniform1f(U.uD,camD); gl.uniform1f(U.uFx,2*F/vw); gl.uniform1f(U.uFy,2*F/vh); gl.uniform1f(U.uOy,80/vh);
+    gl.uniform1f(U.uA,dA); gl.uniform1f(U.uB,dB);
+    gl.uniform3f(U.uCenter, center[0], center[1], center[2]);
+    gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(1.0, 2.0);
+    gl.uniform4f(U.uTint, 1,1,1,1);
+    for (const p of panels){ if (!vis(p) || (p.alpha && !netMode)) continue;
+      const g = bufsFor(p); if (!g) continue;
+      gl.uniform1f(U.uBright, hoverPanel===p.id ? 1.25 : 1);
+      bindDraw(g.triBuf, g.triN, gl.TRIANGLES);
+    }
+    if (!netMode){
+      gl.depthMask(false);
+      for (const p of panels){ if (!vis(p) || !p.alpha) continue;
+        gl.uniform4f(U.uTint, 1,1,1, Math.min(1, hoverPanel===p.id ? p.alpha+0.14 : p.alpha));
+        gl.uniform1f(U.uBright, hoverPanel===p.id ? 1.2 : 1);
+        bindDraw(p.gl3.triBuf, p.gl3.triN, gl.TRIANGLES);
+      }
+      gl.depthMask(true);
+    }
+    gl.disable(gl.POLYGON_OFFSET_FILL);
+    const lc = parseColor(tok.line);
+    gl.uniform1f(U.uBright, 1);
+    for (const p of panels){ if (!vis(p)) continue;
+      const g = bufsFor(p); if (!g) continue;
+      const t = p.lineTint || lc;
+      gl.uniform4f(U.uTint, t[0], t[1], t[2], t[3]);
+      bindDraw(g.lineBuf, g.lineN, gl.LINES);
+    }
+  }
+
+  /* overlay layer: dimensions + tags */
+  ov.clearRect(0,0,vw,vh);
+  if (showDims || isolated) drawDims();
+  if (isolated){
+    const p = panels.find(q=>q.id===isolated);
+    pillText(vw/2, vh - (vw <= 640 ? 148 : 70), p.label + ' — click anywhere to return', tok.accent);
+  }
+}
+
+function pillText(x, y, text, color){
+  // CAD-style label: bare text with a thin halo in the page colour,
+  // readable over any surface without a box
+  ov.font = "400 " + (vw <= 640 ? 10 : 11) + "px 'IBM Plex Mono', monospace";
+  ov.textAlign='center'; ov.textBaseline='middle'; ov.lineJoin='round';
+  ov.lineWidth = 3;
+  ov.strokeStyle = tok.bg;
+  ov.globalAlpha = 0.85;
+  ov.strokeText(text, x, y);
+  ov.globalAlpha = 1;
+  ov.fillStyle = color;
+  ov.fillText(text, x, y);
+}
+function drawDims(){
+  ov.lineWidth = 1.2;
+  const dlist = netMode ? netDims : (isolated ? (isoDims[isolated] || []) : dims);
+  for (const d of dlist){
+    if (d.need && !d.need.some(id => vis(panels.find(p=>p.id===id)))) continue;
+    const Aa=d.a, Bb=d.b, O=d.off;
+    const a2=proj(Aa), b2=proj(Bb);
+    const ao=proj([Aa[0]+O[0],Aa[1]+O[1],Aa[2]+O[2]]), bo=proj([Bb[0]+O[0],Bb[1]+O[1],Bb[2]+O[2]]);
+    ov.strokeStyle = tok.accent; ov.globalAlpha=.3;
+    ov.beginPath(); ov.moveTo(a2[0],a2[1]); ov.lineTo(ao[0],ao[1]);
+    ov.moveTo(b2[0],b2[1]); ov.lineTo(bo[0],bo[1]); ov.stroke();
+    ov.globalAlpha=.65;
+    ov.beginPath(); ov.moveTo(ao[0],ao[1]); ov.lineTo(bo[0],bo[1]); ov.stroke();
+    const dx=bo[0]-ao[0], dy=bo[1]-ao[1], dl=Math.hypot(dx,dy)||1;
+    const px=-dy/dl*5, py=dx/dl*5;
+    ov.beginPath();
+    ov.moveTo(ao[0]-px,ao[1]-py); ov.lineTo(ao[0]+px,ao[1]+py);
+    ov.moveTo(bo[0]-px,bo[1]-py); ov.lineTo(bo[0]+px,bo[1]+py); ov.stroke();
+    pillText((ao[0]+bo[0])/2, (ao[1]+bo[1])/2, d.t, tok.accent);
+  }
+  const tagsOff = vw <= 640 && !netMode && !isolated; // declutter phones: tags on tap/net only
+  for (const p of panels){ if (!vis(p)) continue;
+    if (tagsOff) break;
+    const t = netMode ? p.flatTag : p.tag;
+    if (t){
+      const s = proj(t.p);
+      pillText(s[0], s[1], t.t, tok.ink);
+    }
+    if (netMode && p.flatTags)
+      for (const ft of p.flatTags){ const s = proj(ft.p); pillText(s[0], s[1], ft.t, tok.ink); }
+  }
+  if (!netMode && !isolated){
+    const s = proj([L/2, 2960, W/2]);
+    pillText(s[0], s[1], 'room · 5035 × 3500 · 2725 high', tok.accent);
+  }
+}
+
+/* ---------- interaction ---------- */
+let downAt=null, lastP=null, pinch=null;
+stage.addEventListener('pointerdown', e=>{
+  autoSpin=false; try{ stage.setPointerCapture(e.pointerId); }catch(err){}
+  if (pinch===null && lastP===null){ downAt=[e.clientX,e.clientY]; lastP={id:e.pointerId,x:e.clientX,y:e.clientY}; stage.classList.add('dragging'); }
+  else if (pinch===null && lastP){ pinch={id2:e.pointerId,x:e.clientX,y:e.clientY}; }
+});
+stage.addEventListener('pointermove', e=>{
+  if (pinch && lastP && (e.pointerId===pinch.id2 || e.pointerId===lastP.id)){
+    if (e.pointerId===pinch.id2){ pinch.x=e.clientX; pinch.y=e.clientY; } else { lastP.x=e.clientX; lastP.y=e.clientY; }
+    const dNow = Math.hypot(lastP.x-pinch.x, lastP.y-pinch.y);
+    if (pinch.d0) { zoom = Math.max(.35, Math.min(3.5, pinch.z0 * pinch.d0/dNow)); dirty=true; }
+    else { pinch.d0=dNow; pinch.z0=zoom; }
+    return;
+  }
+  if (lastP && e.pointerId===lastP.id){
+    yaw -= (e.clientX-lastP.x)*0.0052;
+    pitch = Math.max(-0.15, Math.min(1.5, pitch + (e.clientY-lastP.y)*0.0052));
+    lastP.x=e.clientX; lastP.y=e.clientY; dirty=true;
+  } else if (!lastP){
+    hitTest(e.clientX, e.clientY, false);
+  }
+});
+function endPointer(e){
+  if (pinch && e.pointerId===pinch.id2){ pinch=null; return; }
+  if (lastP && e.pointerId===lastP.id){
+    stage.classList.remove('dragging');
+    if (downAt && Math.hypot(e.clientX-downAt[0], e.clientY-downAt[1]) < 5) hitTest(e.clientX, e.clientY, true);
+    lastP=null; pinch=null; downAt=null;
+  }
+}
+stage.addEventListener('pointerup', endPointer);
+stage.addEventListener('pointercancel', endPointer);
+stage.addEventListener('wheel', e=>{
+  e.preventDefault(); autoSpin=false;
+  zoom = Math.max(.35, Math.min(3.5, zoom*Math.exp(e.deltaY*0.0011))); dirty=true;
+}, {passive:false});
+
+function hitTest(x, y, click){
+  if (vw===0) return;
+  let best=null, bestD=Infinity;
+  for (const p of panels){ if (!vis(p)) continue;
+    const faces = netMode ? p.flatFaces : p.faces;
+    if (!faces) continue;
+    for (const f of faces){
+      const q = f.pts.map(proj);
+      let inside=false;
+      for (let i=0,j=q.length-1;i<q.length;j=i++){
+        if ((q[i][1]>y)!==(q[j][1]>y) && x < (q[j][0]-q[i][0])*(y-q[i][1])/(q[j][1]-q[i][1])+q[i][0]) inside=!inside;
+      }
+      if (inside){
+        const d = q.reduce((s,v)=>s+v[2],0)/q.length;
+        if (d < bestD){ bestD=d; best=p; }
+      }
+    }
+  }
+  const id = best ? best.id : null;
+  if (click){
+    if (isolated){ isolated = null; dirty = true; }
+    else if (id === 'outer'){ setPanel('outer', false); } // click the shell to peel it away
+    else if (id){ isolated = id; dirty = true; }
+  }
+  else if (id !== hoverPanel){ hoverPanel=id; stage.style.cursor = id?'pointer':'grab'; dirty=true; }
+}
+
+/* ---------- UI ---------- */
+const dock = document.getElementById('dock');
+for (const p of panels){
+  if (p.noChip) continue;
+  const b = document.createElement('button');
+  b.className='chip'; b.id='chip-'+p.id; b.setAttribute('aria-pressed','true');
+  b.style.setProperty('--sw', p.color);
+  b.innerHTML = `<span class="sw"></span>${p.label}`;
+  b.addEventListener('click', ()=> setPanel(p.id, !p.on));
+  b.addEventListener('pointerenter', ()=>{ hoverPanel=p.id; dirty=true; });
+  b.addEventListener('pointerleave', ()=>{ hoverPanel=null; dirty=true; });
+  dock.appendChild(b);
+}
+function setPanel(id, on){
+  if (isolated) isolated = null;
+  const p = panels.find(q=>q.id===id); p.on=on;
+  if (id === 'man') panels.find(q=>q.id==='piano').on = on; // person + piano share a toggle
+  const chip = document.getElementById('chip-'+id);
+  if (chip) chip.setAttribute('aria-pressed', String(on));
+  if (hoverPanel===id && !on) hoverPanel=null;
+  dirty=true;
+}
+const dimsBtn=document.getElementById('dimsBtn'), listBtn=document.getElementById('listBtn'),
+      netBtn=document.getElementById('netBtn'), drawer=document.getElementById('drawer');
+function setNetMode(on){
+  if (on === netMode) return;
+  netMode = on; autoSpin = false;
+  netBtn.setAttribute('aria-pressed', String(on));
+  if (on){
+    cam3d = {yaw, pitch, zoom, c:[...center]};
+    center[0]=6600; center[1]=0; center[2]=7600;
+    yaw = 0; pitch = 1.45;
+    zoom = Math.min(3.5, Math.max(.35, (10600*F/(0.42*Math.min(vw,vh))) / D0));
+  } else if (cam3d){
+    ({yaw, pitch, zoom} = cam3d);
+    center[0]=cam3d.c[0]; center[1]=cam3d.c[1]; center[2]=cam3d.c[2];
+  }
+  dirty = true;
+}
+netBtn.addEventListener('click', ()=> setNetMode(!netMode));
+dimsBtn.addEventListener('click', ()=>{
+  showDims=!showDims; dimsBtn.setAttribute('aria-pressed',String(showDims)); dirty=true;
+});
+function setDrawer(open){
+  drawer.classList.toggle('open', open);
+  listBtn.setAttribute('aria-pressed', String(open));
+}
+listBtn.addEventListener('click', ()=> setDrawer(!drawer.classList.contains('open')));
+document.getElementById('closeBtn').addEventListener('click', ()=> setDrawer(false));
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  yaw=0; pitch=0.22; zoom=1; dirty=true;
+});
+const hdr = document.querySelector('header');
+function toggleHdr(){
+  hdr.classList.toggle('open');
+  hdr.setAttribute('aria-expanded', String(hdr.classList.contains('open')));
+}
+hdr.addEventListener('click', toggleHdr);
+hdr.addEventListener('keydown', e=>{
+  if (e.key==='Enter' || e.key===' '){ e.preventDefault(); toggleHdr(); }
+});
+addEventListener('keydown', e=>{
+  if (/^[0-9]$/.test(e.key)){ const p=panels[e.key==='0' ? 9 : e.key-1]; if (p) setPanel(p.id, !p.on); }
+  else if (e.key==='d' || e.key==='D') dimsBtn.click();
+  else if (e.key==='n' || e.key==='N') setNetMode(!netMode);
+  else if (e.key==='r' || e.key==='R') document.getElementById('resetBtn').click();
+  else if (e.key==='Escape'){ if (isolated){ isolated=null; dirty=true; } else setDrawer(false); }
+});
+
+/* ---------- loop ---------- */
+readTokens(); initGL(); resize();
+(function tick(){
+  if (autoSpin){ yaw -= 0.0016; dirty=true; }
+  if (dirty){ dirty=false; render(); }
+  requestAnimationFrame(tick);
+})();
+})();
+</script>
+
+</html>
