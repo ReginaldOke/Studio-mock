@@ -197,6 +197,17 @@
   </section>
 
   <section class="cut">
+    <h3>Floor boards <span class="dim mono">11 cuts · no gaps</span></h3>
+    <table class="mono">
+      <tr><td>Layout</td><td>two fields split at 2990 — full labelled map in the 2D net view. Boards go down before the walls and run under them</td></tr>
+      <tr><td>Go down whole</td><td>A1, A2, C, D, H — no cuts</td></tr>
+      <tr><td>Cuts</td><td>B → 2990 · E → 2990 · G → 2045 · F → two 990 pieces (one ripped to 465) · the 1000 × 1000 → 670 × 990 (its offcut gives the 245 × 600 corner patch) · B’s offcut → 255 × 600</td></tr>
+      <tr><td>Fit</td><td>covers the whole 5035 × 3500 with a 20 expansion gap along one edge (chipboard needs one anyway)</td></tr>
+      <tr><td>Support</td><td>screw plank offcuts under any board edge that doesn’t land on a deck plank or rail</td></tr>
+    </table>
+  </section>
+
+  <section class="cut">
     <h3>Long walls × 2 <span class="dim mono">5035 × 2490</span></h3>
     <table class="mono">
       <tr><td><span class="dot dA"></span>Top &amp; bottom</td><td>5035 × 35 — 2 per wall</td></tr>
@@ -362,6 +373,28 @@ const wallBMembers = (() => {
   }
   return m;
 })();
+/* chipboard floor boards: best-fit layout for the stock on hand.
+   Two fields split at x=2990. 6 straight cuts; A1 A2 C D H go down whole.
+   Stock totals 17.14 m2 vs the 17.62 m2 floor, so two gaps remain to patch.
+   Entry: [x, z, w, h, colour, label] */
+const BOARD_PIECES = [
+  [0,    0,    2990, 1040, [196,167,125], 'B 3245×1040 → 2990'],
+  [0,    1040, 670,  990,  [214,190,150], 'I 1000×1000 → 670×990'],
+  [670,  1040, 2320, 990,  [184,152,110], 'D 2320×990 · uncut'],
+  [0,    2030, 2045, 990,  [203,176,138], 'C 2045×990 · uncut'],
+  [2045, 2030, 480,  990,  [172,142,102], 'F① 990×480'],
+  [2525, 2030, 465,  990,  [190,158,118], 'F② 990×465'],
+  [0,    3020, 2990, 480,  [209,182,144], 'E 3135×480 → 2990'],
+  [2990, 0,    2045, 1005, [199,171,131], 'A1 2045×1005 · uncut'],
+  [2990, 1005, 2045, 1005, [187,157,116], 'A2 2045×1005 · uncut'],
+  [2990, 2010, 2045, 870,  [205,178,140], 'G 2110×870 → 2045'],
+  [2990, 2880, 1545, 600,  [181,149,108], 'H 1545×600 · uncut'],
+  [4535, 2880, 255,  600,  [176,148,104], 'B-offcut 255×600'],
+  [4790, 2880, 245,  600,  [220,196,158], 'I-offcut 245×600'],
+];
+const BOARD_GAPS = [
+  [2990, 3480, 2045, 20, '20 expansion gap'],
+];
 const endWallMembers = (() => {
   // trimmed 90 each side (3500 → 3320) to fit flush between the long walls
   const m = [];
@@ -596,6 +629,21 @@ const panels = [
   {id:'door', label:'Door', color:'#7a5c40', alpha:0.55, on:true, noChip:true,
    faces:buildPanel([[3053,450,820,2040]], (mx,my,w,h)=>{ const [y0,y1]=wallY(my,h); return wbox(mx,mx+w, y0,y1, W-T,W); }),
    tag:null},
+  /* chipboard floor boards laid on the deck; red = the gaps to patch */
+  (() => {
+    const y0 = FLOOR_TOP, faces = [];
+    for (const [x,z,w,h,c] of BOARD_PIECES){
+      const b = box(x+2,x+w-2, y0+0.3,y0+20, z+2,z+h-2);
+      for (const f of b) f.col = c;
+      faces.push(...b);
+    }
+    for (const [x,z,w,h] of BOARD_GAPS){
+      const b = box(x+2,x+w-2, y0+0.3,y0+6, z+2,z+h-2);
+      for (const f of b) f.red = true;
+      faces.push(...b);
+    }
+    return {id:'boards', label:'Floor boards', color:'#c2a678', on:true, faces, tag:null};
+  })(),
 ];
 for (const p of panels) for (const f of p.faces) f.panel = p;
 
@@ -618,6 +666,29 @@ const flatDeck = (members, ox, oz) => buildPanel(members, (mx,my,w,h)=> box(ox+m
     p.flatTag = {p:[s.tag[0], T, s.tag[1]], t:s.t};
   }
   panels.find(p=>p.id==='floor').flatTags = [{p:[2517, 30, 3800], t:'red = support row to add @ 2500'}];
+  /* chipboard cutting map: floor outline with every board placed, labelled
+     pre-cut size → post-cut size; red = the 20 expansion strip */
+  {
+    const bp2 = panels.find(p=>p.id==='boards');
+    const OZ = 16400, faces = [], tags = [];
+    for (const [x,z,w,h,c,lab] of BOARD_PIECES){
+      const b = box(x+3,x+w-3, 0.3,25, OZ+z+3,OZ+z+h-3);
+      for (const f of b) f.col = c;
+      faces.push(...b);
+      tags.push({p:[x+w/2, 40, OZ+z+h/2], t:lab});
+    }
+    for (const [x,z,w,h,lab] of BOARD_GAPS){
+      const b = box(x+3,x+w-3, 0.3,10, OZ+z+2,OZ+z+h-2);
+      for (const f of b) f.red = true;
+      faces.push(...b);
+      tags.push({p:[x+w/2, 40, OZ+z+h/2+140], t:lab});
+    }
+    tags.push({p:[2517, 40, OZ-260], t:'Floor boards · 11 straight cuts · no gaps'});
+    for (const f of faces) f.panel = bp2;
+    bp2.flatFaces = faces;
+    bp2.flatTags = tags;
+    bp2.flatTag = null;
+  }
   /* OSB buying layout: every piece inside its full 2745 × 1200 sheet, gapped.
      20 sheets — the two 145 rips share sheets with the two 998 rips. */
   const wallPc = w => ({pieces:[[w,2478]], t:w+' × 2478'});
@@ -670,6 +741,9 @@ const netDims = [
   {a:[0,0,10100], b:[1200,0,10100], off:[0,0,-300], t:'1200', need:['osb']},
   {a:[0,0,10100], b:[0,0,12845], off:[-300,0,0], t:'2745', need:['osb']},
   {a:[5035,0,0], b:[5035,0,2500], off:[320,0,0], t:'2500', need:['floor']},
+  {a:[0,0,19900], b:[5035,0,19900], off:[0,0,320], t:'5035', need:['boards']},
+  {a:[0,0,16400], b:[0,0,19900], off:[-320,0,0], t:'3500', need:['boards']},
+  {a:[0,0,16400], b:[2990,0,16400], off:[0,0,-300], t:'2990', need:['boards']},
 ];
 let netMode = false, cam3d = null;
 
@@ -877,7 +951,7 @@ function render(){
   /* background layer: grid + shadow */
   bg.clearRect(0,0,vw,vh);
   bg.lineWidth = 1;
-  const gb = netMode ? [-1000, 14500, -1000, 16500] : [-2000, 8500, -2000, 8500];
+  const gb = netMode ? [-1000, 14500, -1000, 21000] : [-2000, 8500, -2000, 8500];
   for (let gx=gb[0]; gx<=gb[1]; gx+=500){
     const a = proj([gx,0,gb[2]]), b = proj([gx,0,gb[3]]);
     bg.strokeStyle = (gx%1000===0) ? tok.grid2 : tok.grid;
@@ -1090,9 +1164,9 @@ function setNetMode(on){
   netBtn.setAttribute('aria-pressed', String(on));
   if (on){
     cam3d = {yaw, pitch, zoom, c:[...center]};
-    center[0]=6600; center[1]=0; center[2]=7600;
+    center[0]=6600; center[1]=0; center[2]=9800;
     yaw = 0; pitch = 1.45;
-    zoom = Math.min(3.5, Math.max(.35, (10600*F/(0.42*Math.min(vw,vh))) / D0));
+    zoom = Math.min(3.5, Math.max(.35, (13000*F/(0.42*Math.min(vw,vh))) / D0));
   } else if (cam3d){
     ({yaw, pitch, zoom} = cam3d);
     center[0]=cam3d.c[0]; center[1]=cam3d.c[1]; center[2]=cam3d.c[2];
