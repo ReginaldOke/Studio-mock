@@ -82,7 +82,15 @@
     padding:10px 14px 8px; max-height:calc(100vh - 140px); overflow-y:auto;
   }
   #boardKey.show{display:block}
-  #boardKey h4{margin:0 0 7px; font:700 12px 'Archivo',sans-serif; color:var(--ink)}
+  #boardKey h4{margin:0 0 7px; font:700 12px 'Archivo',sans-serif; color:var(--ink);
+    cursor:pointer; user-select:none; -webkit-user-select:none}
+  #boardKey h4::after{content:'  ⌃'; color:var(--ink2); font-weight:500}
+  #boardKey.collapsed h4{margin:0}
+  #boardKey.collapsed h4::after{content:'  ⌄'}
+  #boardKey.collapsed .kbody{display:none}
+  #boardKey h5{margin:8px 0 3px; font:600 10px 'Archivo',sans-serif; color:var(--ink2);
+    text-transform:uppercase; letter-spacing:.07em}
+  #boardKey h5:first-child{margin-top:2px}
   #boardKey .krow{display:flex; align-items:center; gap:8px; padding:2.5px 0;
     font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink);
     font-variant-numeric:tabular-nums}
@@ -417,6 +425,20 @@ const BOARD_PIECES = [
 const BOARD_GAPS = [
   [2990, 3480, 2045, 20, '20 expansion gap'],
 ];
+const boardUncut = p => p[6].includes('uncut');
+/* diagonal hatch stripes — the "texture" marking boards that go down uncut */
+function hatchFaces(x0, z0, w, h, y, c){
+  const dark = c.map(v => Math.round(v*0.74));
+  const out = [], s = 260, hw = 6/Math.SQRT2;
+  for (let d = s; d < w+h; d += s){
+    const u1 = Math.max(0, d-h), u2 = Math.min(w, d);
+    if (u2 - u1 < 60) continue;
+    const ax = x0+u1, az = z0+d-u1, bx = x0+u2, bz = z0+d-u2;
+    out.push({pts:[[ax+hw,y,az+hw],[bx+hw,y,bz+hw],[bx-hw,y,bz-hw],[ax-hw,y,az-hw]],
+      n:[0,1,0], col:dark, noline:true});
+  }
+  return out;
+}
 const endWallMembers = (() => {
   // trimmed 90 each side (3500 → 3320) to fit flush between the long walls
   const m = [];
@@ -654,10 +676,12 @@ const panels = [
   /* chipboard floor boards laid on the deck, colour-coded per piece */
   (() => {
     const y0 = FLOOR_TOP, faces = [];
-    for (const [x,z,w,h,c] of BOARD_PIECES){
+    for (const pc of BOARD_PIECES){
+      const [x,z,w,h,c] = pc;
       const b = box(x+2,x+w-2, y0+0.3,y0+20, z+2,z+h-2);
       for (const f of b) f.col = c;
       faces.push(...b);
+      if (boardUncut(pc)) faces.push(...hatchFaces(x+8, z+8, w-16, h-16, y0+20.5, c));
     }
     for (const [x,z,w,h] of BOARD_GAPS){
       const b = box(x+2,x+w-2, y0+0.3,y0+6, z+2,z+h-2);
@@ -693,10 +717,12 @@ const flatDeck = (members, ox, oz) => buildPanel(members, (mx,my,w,h)=> box(ox+m
   {
     const bp2 = panels.find(p=>p.id==='boards');
     const faces = [], tags = [];
-    for (const [x,z,w,h,c,letter] of BOARD_PIECES){
+    for (const pc of BOARD_PIECES){
+      const [x,z,w,h,c,letter] = pc;
       const b = box(x+4,x+w-4, 0.3,25, z+4,z+h-4);
       for (const f of b) f.col = c;
       faces.push(...b);
+      if (boardUncut(pc)) faces.push(...hatchFaces(x+10, z+10, w-20, h-20, 25.6, c));
       tags.push({p:[x+w/2, 40, z+h/2], t:letter, big:true});
     }
     for (const [x,z,w,h,lab] of BOARD_GAPS){
@@ -1212,12 +1238,22 @@ function setFlatView(kind){ // '3d' | 'net' | 'boards'
 }
 netBtn.addEventListener('click', ()=> setFlatView(netMode && !boardsOnly ? '3d' : 'net'));
 boardsBtn.addEventListener('click', ()=> setFlatView(boardsOnly ? '3d' : 'boards'));
-{ // colour key for the cutting map
-  let rows = '<h4>Cutting key · 11 straight cuts</h4>';
-  for (const [,,,,c,letter,txt] of BOARD_PIECES)
-    rows += `<div class="krow"><span class="ksw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span><span class="klet">${letter}</span><span>${txt}</span></div>`;
-  rows += '<div class="krow"><span class="ksw" style="background:#d64541"></span><span class="klet"></span><span>20 expansion gap (leave open)</span></div>';
-  boardKey.innerHTML = rows;
+{ // colour key for the cutting map — uncut boards grouped, striped like the map
+  const row = ([,,,,c,letter,txt], striped) => {
+    const bg = striped
+      ? `repeating-linear-gradient(45deg, rgb(${c[0]},${c[1]},${c[2]}), rgb(${c[0]},${c[1]},${c[2]}) 4px, rgb(${Math.round(c[0]*.74)},${Math.round(c[1]*.74)},${Math.round(c[2]*.74)}) 4px, rgb(${Math.round(c[0]*.74)},${Math.round(c[1]*.74)},${Math.round(c[2]*.74)}) 6px)`
+      : `rgb(${c[0]},${c[1]},${c[2]})`;
+    return `<div class="krow"><span class="ksw" style="background:${bg}"></span><span class="klet">${letter}</span><span>${txt.replace(' · uncut','')}</span></div>`;
+  };
+  let html = '<h4>Cutting key · 11 straight cuts</h4><div class="kbody">';
+  html += '<h5>Striped — lay whole, no cuts</h5>';
+  for (const p of BOARD_PIECES) if (boardUncut(p)) html += row(p, true);
+  html += '<h5>Cut these</h5>';
+  for (const p of BOARD_PIECES) if (!boardUncut(p)) html += row(p, false);
+  html += '<div class="krow"><span class="ksw" style="background:#d64541"></span><span class="klet"></span><span>20 expansion gap (leave open)</span></div>';
+  html += '</div>';
+  boardKey.innerHTML = html;
+  boardKey.querySelector('h4').addEventListener('click', ()=> boardKey.classList.toggle('collapsed'));
 }
 dimsBtn.addEventListener('click', ()=>{
   showDims=!showDims; dimsBtn.setAttribute('aria-pressed',String(showDims)); dirty=true;
