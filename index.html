@@ -74,6 +74,25 @@
     overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
   }
   .dock::-webkit-scrollbar{display:none}
+  body.boardsview .dock{display:none}
+  #boardKey{
+    position:fixed; top:64px; right:16px; z-index:5; display:none;
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    padding:10px 14px 8px; max-height:calc(100vh - 140px); overflow-y:auto;
+  }
+  #boardKey.show{display:block}
+  #boardKey h4{margin:0 0 7px; font:700 12px 'Archivo',sans-serif; color:var(--ink)}
+  #boardKey .krow{display:flex; align-items:center; gap:8px; padding:2.5px 0;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink);
+    font-variant-numeric:tabular-nums}
+  .ksw{width:12px; height:12px; border-radius:3px; flex:none}
+  .klet{width:24px; font-weight:600; flex:none}
+  @media (max-width:640px){
+    #boardKey{top:auto; bottom:calc(10px + env(safe-area-inset-bottom)); left:10px; right:10px;
+      max-height:38vh; padding:8px 10px 6px}
+    #boardKey .krow{font-size:10.5px; padding:1.5px 0}
+  }
   .chip{
     appearance:none; display:flex; align-items:center; gap:7px; white-space:nowrap; cursor:pointer;
     border:1px solid var(--line); background:var(--card); color:var(--ink);
@@ -151,12 +170,14 @@
 
 <div class="actions">
   <button class="btn" id="netBtn" aria-pressed="false">2D net</button>
+  <button class="btn" id="boardsBtn" aria-pressed="false">Boards</button>
   <button class="btn" id="dimsBtn" aria-pressed="true">Dimensions</button>
   <button class="btn" id="listBtn" aria-pressed="false">Cut list</button>
   <button class="btn" id="resetBtn">Reset view</button>
 </div>
 
 <div class="dock" id="dock" role="group" aria-label="Toggle panels"></div>
+<div id="boardKey" aria-label="Cutting key"></div>
 
 <aside id="drawer" aria-label="Cut list">
   <button class="btn close" id="closeBtn">Close</button>
@@ -199,7 +220,7 @@
   <section class="cut">
     <h3>Floor boards <span class="dim mono">11 cuts · no gaps</span></h3>
     <table class="mono">
-      <tr><td>Layout</td><td>two fields split at 2990 — full labelled map in the 2D net view. Boards go down before the walls and run under them</td></tr>
+      <tr><td>Layout</td><td>two fields split at 2990 — see the Boards view for the colour-coded cutting map and key. Boards go down before the walls and run under them</td></tr>
       <tr><td>Go down whole</td><td>A1, A2, C, D, H — no cuts</td></tr>
       <tr><td>Cuts</td><td>B → 2990 · E → 2990 · G → 2045 · F → two 990 pieces (one ripped to 465) · the 1000 × 1000 → 670 × 990 (its offcut gives the 245 × 600 corner patch) · B’s offcut → 255 × 600</td></tr>
       <tr><td>Fit</td><td>covers the whole 5035 × 3500 with a 20 expansion gap along one edge (chipboard needs one anyway)</td></tr>
@@ -377,20 +398,21 @@ const wallBMembers = (() => {
    Two fields split at x=2990. 6 straight cuts; A1 A2 C D H go down whole.
    Stock totals 17.14 m2 vs the 17.62 m2 floor, so two gaps remain to patch.
    Entry: [x, z, w, h, colour, label] */
+/* entry: [x, z, w, h, colour, letter, key text] */
 const BOARD_PIECES = [
-  [0,    0,    2990, 1040, [196,167,125], 'B 3245×1040 → 2990'],
-  [0,    1040, 670,  990,  [214,190,150], 'I 1000×1000 → 670×990'],
-  [670,  1040, 2320, 990,  [184,152,110], 'D 2320×990 · uncut'],
-  [0,    2030, 2045, 990,  [203,176,138], 'C 2045×990 · uncut'],
-  [2045, 2030, 480,  990,  [172,142,102], 'F① 990×480'],
-  [2525, 2030, 465,  990,  [190,158,118], 'F② 990×465'],
-  [0,    3020, 2990, 480,  [209,182,144], 'E 3135×480 → 2990'],
-  [2990, 0,    2045, 1005, [199,171,131], 'A1 2045×1005 · uncut'],
-  [2990, 1005, 2045, 1005, [187,157,116], 'A2 2045×1005 · uncut'],
-  [2990, 2010, 2045, 870,  [205,178,140], 'G 2110×870 → 2045'],
-  [2990, 2880, 1545, 600,  [181,149,108], 'H 1545×600 · uncut'],
-  [4535, 2880, 255,  600,  [176,148,104], 'B-offcut 255×600'],
-  [4790, 2880, 245,  600,  [220,196,158], 'I-offcut 245×600'],
+  [0,    0,    2990, 1040, [196,116,106], 'B',  '3245 × 1040 → cut to 2990'],
+  [0,    1040, 670,  990,  [138,188,208], 'I',  '1000 × 1000 → 670 × 990'],
+  [670,  1040, 2320, 990,  [156,134,186], 'D',  '2320 × 990 · uncut'],
+  [0,    2030, 2045, 990,  [128,176,132], 'C',  '2045 × 990 · uncut'],
+  [2045, 2030, 480,  990,  [110,176,176], 'F①', 'from F: 990 × 480'],
+  [2525, 2030, 465,  990,  [88,152,152],  'F②', 'from F: 990 × 465'],
+  [0,    3020, 2990, 480,  [210,186,110], 'E',  '3135 × 480 → cut to 2990'],
+  [2990, 0,    2045, 1005, [122,158,196], 'A1', '2045 × 1005 · uncut'],
+  [2990, 1005, 2045, 1005, [100,138,178], 'A2', '2045 × 1005 · uncut'],
+  [2990, 2010, 2045, 870,  [214,158,96],  'G',  '2110 × 870 → cut to 2045'],
+  [2990, 2880, 1545, 600,  [200,130,160], 'H',  '1545 × 600 · uncut'],
+  [4535, 2880, 255,  600,  [156,88,80],   'B†', 'B offcut → 255 × 600'],
+  [4790, 2880, 245,  600,  [96,140,158],  'I†', 'I offcut → 245 × 600'],
 ];
 const BOARD_GAPS = [
   [2990, 3480, 2045, 20, '20 expansion gap'],
@@ -629,7 +651,7 @@ const panels = [
   {id:'door', label:'Door', color:'#7a5c40', alpha:0.55, on:true, noChip:true,
    faces:buildPanel([[3053,450,820,2040]], (mx,my,w,h)=>{ const [y0,y1]=wallY(my,h); return wbox(mx,mx+w, y0,y1, W-T,W); }),
    tag:null},
-  /* chipboard floor boards laid on the deck; red = the gaps to patch */
+  /* chipboard floor boards laid on the deck, colour-coded per piece */
   (() => {
     const y0 = FLOOR_TOP, faces = [];
     for (const [x,z,w,h,c] of BOARD_PIECES){
@@ -666,24 +688,23 @@ const flatDeck = (members, ox, oz) => buildPanel(members, (mx,my,w,h)=> box(ox+m
     p.flatTag = {p:[s.tag[0], T, s.tag[1]], t:s.t};
   }
   panels.find(p=>p.id==='floor').flatTags = [{p:[2517, 30, 3800], t:'red = support row to add @ 2500'}];
-  /* chipboard cutting map: floor outline with every board placed, labelled
-     pre-cut size → post-cut size; red = the 20 expansion strip */
+  /* chipboard cutting map — shown in its own Boards view: floor outline with
+     every board colour-coded and lettered; the key card carries the sizes */
   {
     const bp2 = panels.find(p=>p.id==='boards');
-    const OZ = 16400, faces = [], tags = [];
-    for (const [x,z,w,h,c,lab] of BOARD_PIECES){
-      const b = box(x+3,x+w-3, 0.3,25, OZ+z+3,OZ+z+h-3);
+    const faces = [], tags = [];
+    for (const [x,z,w,h,c,letter] of BOARD_PIECES){
+      const b = box(x+4,x+w-4, 0.3,25, z+4,z+h-4);
       for (const f of b) f.col = c;
       faces.push(...b);
-      tags.push({p:[x+w/2, 40, OZ+z+h/2], t:lab});
+      tags.push({p:[x+w/2, 40, z+h/2], t:letter, big:true});
     }
     for (const [x,z,w,h,lab] of BOARD_GAPS){
-      const b = box(x+3,x+w-3, 0.3,10, OZ+z+2,OZ+z+h-2);
+      const b = box(x+3,x+w-3, 0.3,10, z+2,z+h-2);
       for (const f of b) f.red = true;
       faces.push(...b);
-      tags.push({p:[x+w/2, 40, OZ+z+h/2+140], t:lab});
+      tags.push({p:[x+w/2, 40, z+h/2+150], t:lab});
     }
-    tags.push({p:[2517, 40, OZ-260], t:'Floor boards · 11 straight cuts · no gaps'});
     for (const f of faces) f.panel = bp2;
     bp2.flatFaces = faces;
     bp2.flatTags = tags;
@@ -741,15 +762,18 @@ const netDims = [
   {a:[0,0,10100], b:[1200,0,10100], off:[0,0,-300], t:'1200', need:['osb']},
   {a:[0,0,10100], b:[0,0,12845], off:[-300,0,0], t:'2745', need:['osb']},
   {a:[5035,0,0], b:[5035,0,2500], off:[320,0,0], t:'2500', need:['floor']},
-  {a:[0,0,19900], b:[5035,0,19900], off:[0,0,320], t:'5035', need:['boards']},
-  {a:[0,0,16400], b:[0,0,19900], off:[-320,0,0], t:'3500', need:['boards']},
-  {a:[0,0,16400], b:[2990,0,16400], off:[0,0,-300], t:'2990', need:['boards']},
+  {a:[0,0,3500], b:[5035,0,3500], off:[0,0,320], t:'5035', need:['boards']},
+  {a:[0,0,0], b:[0,0,3500], off:[-320,0,0], t:'3500', need:['boards']},
+  {a:[0,0,0], b:[2990,0,0], off:[0,0,-300], t:'2990', need:['boards']},
 ];
 let netMode = false, cam3d = null;
 
 /* ---------- isolate-on-click: measurements per panel ---------- */
-let isolated = null;
+let isolated = null, boardsOnly = false;
 const vis = p => isolated ? p.id === isolated : p.on;
+// what actually draws in the current view: the Boards view shows only the
+// cutting map; the 2D net shows everything except it
+const shown = p => vis(p) && (!netMode ? true : (boardsOnly ? p.id === 'boards' : p.id !== 'boards'));
 const isoDims = {
   floor: [
     {a:[0,LIFT,W], b:[L,LIFT,W], off:[0,0,380], t:'5035'},
@@ -951,7 +975,8 @@ function render(){
   /* background layer: grid + shadow */
   bg.clearRect(0,0,vw,vh);
   bg.lineWidth = 1;
-  const gb = netMode ? [-1000, 14500, -1000, 21000] : [-2000, 8500, -2000, 8500];
+  const gb = netMode ? (boardsOnly ? [-1000, 6000, -1000, 4500] : [-1000, 14500, -1000, 16500])
+                     : [-2000, 8500, -2000, 8500];
   for (let gx=gb[0]; gx<=gb[1]; gx+=500){
     const a = proj([gx,0,gb[2]]), b = proj([gx,0,gb[3]]);
     bg.strokeStyle = (gx%1000===0) ? tok.grid2 : tok.grid;
@@ -983,14 +1008,14 @@ function render(){
     gl.uniform3f(U.uCenter, center[0], center[1], center[2]);
     gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(1.0, 2.0);
     gl.uniform4f(U.uTint, 1,1,1,1);
-    for (const p of panels){ if (!vis(p) || (p.alpha && !netMode)) continue;
+    for (const p of panels){ if (!shown(p) || (p.alpha && !netMode)) continue;
       const g = bufsFor(p); if (!g) continue;
       gl.uniform1f(U.uBright, hoverPanel===p.id ? 1.25 : 1);
       bindDraw(g.triBuf, g.triN, gl.TRIANGLES);
     }
     if (!netMode){
       gl.depthMask(false);
-      for (const p of panels){ if (!vis(p) || !p.alpha) continue;
+      for (const p of panels){ if (!shown(p) || !p.alpha) continue;
         gl.uniform4f(U.uTint, 1,1,1, Math.min(1, hoverPanel===p.id ? p.alpha+0.14 : p.alpha));
         gl.uniform1f(U.uBright, hoverPanel===p.id ? 1.2 : 1);
         bindDraw(p.gl3.triBuf, p.gl3.triN, gl.TRIANGLES);
@@ -1000,7 +1025,7 @@ function render(){
     gl.disable(gl.POLYGON_OFFSET_FILL);
     const lc = parseColor(tok.line);
     gl.uniform1f(U.uBright, 1);
-    for (const p of panels){ if (!vis(p)) continue;
+    for (const p of panels){ if (!shown(p)) continue;
       const g = bufsFor(p); if (!g) continue;
       const t = p.lineTint || lc;
       gl.uniform4f(U.uTint, t[0], t[1], t[2], t[3]);
@@ -1017,10 +1042,11 @@ function render(){
   }
 }
 
-function pillText(x, y, text, color){
+function pillText(x, y, text, color, big){
   // CAD-style label: bare text with a thin halo in the page colour,
   // readable over any surface without a box
-  ov.font = "400 " + (vw <= 640 ? 10 : 11) + "px 'IBM Plex Mono', monospace";
+  ov.font = big ? "700 16px 'IBM Plex Mono', monospace"
+              : "400 " + (vw <= 640 ? 10 : 11) + "px 'IBM Plex Mono', monospace";
   ov.textAlign='center'; ov.textBaseline='middle'; ov.lineJoin='round';
   ov.lineWidth = 3;
   ov.strokeStyle = tok.bg;
@@ -1034,7 +1060,7 @@ function drawDims(){
   ov.lineWidth = 1.2;
   const dlist = netMode ? netDims : (isolated ? (isoDims[isolated] || []) : dims);
   for (const d of dlist){
-    if (d.need && !d.need.some(id => vis(panels.find(p=>p.id===id)))) continue;
+    if (d.need && !d.need.some(id => shown(panels.find(p=>p.id===id)))) continue;
     const Aa=d.a, Bb=d.b, O=d.off;
     const a2=proj(Aa), b2=proj(Bb);
     const ao=proj([Aa[0]+O[0],Aa[1]+O[1],Aa[2]+O[2]]), bo=proj([Bb[0]+O[0],Bb[1]+O[1],Bb[2]+O[2]]);
@@ -1051,7 +1077,7 @@ function drawDims(){
     pillText((ao[0]+bo[0])/2, (ao[1]+bo[1])/2, d.t, tok.accent);
   }
   const tagsOff = vw <= 640 && !netMode && !isolated; // declutter phones: tags on tap/net only
-  for (const p of panels){ if (!vis(p)) continue;
+  for (const p of panels){ if (!shown(p)) continue;
     if (tagsOff) break;
     const t = netMode ? p.flatTag : p.tag;
     if (t){
@@ -1059,7 +1085,7 @@ function drawDims(){
       pillText(s[0], s[1], t.t, tok.ink);
     }
     if (netMode && p.flatTags)
-      for (const ft of p.flatTags){ const s = proj(ft.p); pillText(s[0], s[1], ft.t, tok.ink); }
+      for (const ft of p.flatTags){ const s = proj(ft.p); pillText(s[0], s[1], ft.t, tok.ink, ft.big); }
   }
   if (!netMode && !isolated){
     const s = proj([L/2, 2960, W/2]);
@@ -1107,8 +1133,9 @@ stage.addEventListener('wheel', e=>{
 
 function hitTest(x, y, click){
   if (vw===0) return;
+  if (boardsOnly) return; // the Boards view is a static reference sheet
   let best=null, bestD=Infinity;
-  for (const p of panels){ if (!vis(p)) continue;
+  for (const p of panels){ if (!shown(p)) continue;
     const faces = netMode ? p.flatFaces : p.faces;
     if (!faces) continue;
     for (const f of faces){
@@ -1157,23 +1184,41 @@ function setPanel(id, on){
   dirty=true;
 }
 const dimsBtn=document.getElementById('dimsBtn'), listBtn=document.getElementById('listBtn'),
-      netBtn=document.getElementById('netBtn'), drawer=document.getElementById('drawer');
-function setNetMode(on){
-  if (on === netMode) return;
-  netMode = on; autoSpin = false;
-  netBtn.setAttribute('aria-pressed', String(on));
-  if (on){
-    cam3d = {yaw, pitch, zoom, c:[...center]};
-    center[0]=6600; center[1]=0; center[2]=9800;
+      netBtn=document.getElementById('netBtn'), boardsBtn=document.getElementById('boardsBtn'),
+      boardKey=document.getElementById('boardKey'), drawer=document.getElementById('drawer');
+function setFlatView(kind){ // '3d' | 'net' | 'boards'
+  const entering = kind !== '3d';
+  if (!netMode && entering) cam3d = {yaw, pitch, zoom, c:[...center]};
+  netMode = entering; boardsOnly = kind === 'boards';
+  autoSpin = false; hoverPanel = null; isolated = null;
+  netBtn.setAttribute('aria-pressed', String(kind === 'net'));
+  boardsBtn.setAttribute('aria-pressed', String(boardsOnly));
+  boardKey.classList.toggle('show', boardsOnly);
+  document.body.classList.toggle('boardsview', boardsOnly);
+  if (entering){
     yaw = 0; pitch = 1.45;
-    zoom = Math.min(3.5, Math.max(.35, (13000*F/(0.42*Math.min(vw,vh))) / D0));
+    if (boardsOnly){
+      center[0]=2900; center[1]=0; center[2]=1650;
+      zoom = Math.min(3.5, Math.max(.35, (3450*F/(0.42*Math.min(vw,vh))) / D0));
+    } else {
+      center[0]=6600; center[1]=0; center[2]=7600;
+      zoom = Math.min(3.5, Math.max(.35, (10600*F/(0.42*Math.min(vw,vh))) / D0));
+    }
   } else if (cam3d){
     ({yaw, pitch, zoom} = cam3d);
     center[0]=cam3d.c[0]; center[1]=cam3d.c[1]; center[2]=cam3d.c[2];
   }
   dirty = true;
 }
-netBtn.addEventListener('click', ()=> setNetMode(!netMode));
+netBtn.addEventListener('click', ()=> setFlatView(netMode && !boardsOnly ? '3d' : 'net'));
+boardsBtn.addEventListener('click', ()=> setFlatView(boardsOnly ? '3d' : 'boards'));
+{ // colour key for the cutting map
+  let rows = '<h4>Cutting key · 11 straight cuts</h4>';
+  for (const [,,,,c,letter,txt] of BOARD_PIECES)
+    rows += `<div class="krow"><span class="ksw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span><span class="klet">${letter}</span><span>${txt}</span></div>`;
+  rows += '<div class="krow"><span class="ksw" style="background:#d64541"></span><span class="klet"></span><span>20 expansion gap (leave open)</span></div>';
+  boardKey.innerHTML = rows;
+}
 dimsBtn.addEventListener('click', ()=>{
   showDims=!showDims; dimsBtn.setAttribute('aria-pressed',String(showDims)); dirty=true;
 });
@@ -1198,7 +1243,8 @@ hdr.addEventListener('keydown', e=>{
 addEventListener('keydown', e=>{
   if (/^[0-9]$/.test(e.key)){ const p=panels[e.key==='0' ? 9 : e.key-1]; if (p) setPanel(p.id, !p.on); }
   else if (e.key==='d' || e.key==='D') dimsBtn.click();
-  else if (e.key==='n' || e.key==='N') setNetMode(!netMode);
+  else if (e.key==='n' || e.key==='N') setFlatView(netMode && !boardsOnly ? '3d' : 'net');
+  else if (e.key==='b' || e.key==='B') setFlatView(boardsOnly ? '3d' : 'boards');
   else if (e.key==='r' || e.key==='R') document.getElementById('resetBtn').click();
   else if (e.key==='Escape'){ if (isolated){ isolated=null; dirty=true; } else setDrawer(false); }
 });
