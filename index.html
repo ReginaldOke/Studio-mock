@@ -218,10 +218,11 @@
   <section class="cut">
     <h3>Shopping list</h3>
     <table class="mono">
-      <tr><td>Planks 90 × 35</td><td>≈276 m (249.6 m of cuts + waste). 5.4 m lengths for the ~10 long planks; ≥2.7 m stock for the 2420 uprights</td></tr>
+      <tr><td>Planks 90 × 35</td><td>≈287 m (259.1 m of cuts + waste). 5.4 m lengths for the ~10 long planks; ≥2.7 m stock for the 2420 uprights</td></tr>
       <tr><td>OSB sheets</td><td>20 × <a href="https://www.bunnings.com.au/2745-x-1200mm-6mm-braceboard-osb_p0166651" target="_blank" rel="noopener" style="color:var(--accent)">2745 × 1200 braceboard</a></td></tr>
       <tr><td>Feet</td><td>32 × Builders Edge pedestal feet (<a href="https://www.bunnings.com.au/builders-edge-25-40mm-minifoot-pedestal-feet_p2450073" target="_blank" rel="noopener" style="color:var(--accent)">25–40</a> mid-room, <a href="https://www.bunnings.com.au/builders-edge-pedestal-foot-smallfoot-35-60mm_p2450074" target="_blank" rel="noopener" style="color:var(--accent)">35–60</a> at the ends) + 3 × <a href="https://www.bunnings.com.au/jack-100mm-x-1m-anti-vibration-pad_p3961983" target="_blank" rel="noopener" style="color:var(--accent)">rubber roll</a> + 1 bucket of <a href="https://www.bunnings.com.au/macsim-140mm-assorted-packer-window-100-bucket_p0091691" target="_blank" rel="noopener" style="color:var(--accent)">packers</a></td></tr>
       <tr><td>Door</td><td>pre-hung 2040 × 820 door + frame set</td></tr>
+      <tr><td>Window</td><td>1 × free timber frame with fixed glass, 1800 × 850 × 140 (Marketplace, Belmore) — check the glass thickness</td></tr>
     </table>
   </section>
 
@@ -243,6 +244,7 @@
       <tr><td><span class="dot dA"></span>Top &amp; bottom</td><td>5035 × 35 — 2 per wall</td></tr>
       <tr><td><span class="dot dB"></span>Uprights × 10</td><td>cut 2420 — at 0, 591, 1182, 1773, 2382, 2982, 3582, 4182, 4782, 4999</td></tr>
       <tr><td><span class="dot dC"></span>Crosspieces × 23</td><td>rows at 478 / 877 / 1268 / 1755 / 2059 down from the top — cut each to its gap (555–573, one 181)</td></tr>
+      <tr><td>Window (Wall B)</td><td>centred between the corner wall and the door, over the piano: clear opening 1820 × 870, starting 644 from the corner, 1300 up to the frame’s bottom edge. Move the upright at 591 to 572 so it is the left side; add a full upright at 2500, two 2125 side posts at 608 and 2464, a header of two 1892 × 90 planks nailed together on edge, and a 1820 sill plank. The old uprights at 1182 / 1773 / 2382 become short pieces: 205 above and 1220 below. The 140-deep frame sits flush outside and stands 38 into the room</td></tr>
       <tr><td>Doorway (Wall B)</td><td>opening 890 × 2107 starting at 3018 — add a full upright at 3908, a 313 piece over the door, an 890 cap; leave the bottom plank out across the opening</td></tr>
     </table>
   </section>
@@ -302,7 +304,7 @@
       </svg>
     </div>
     <table class="mono">
-      <tr><td>Layout</td><td>32 feet — one every ~840 along the deck’s four support lines, plus 4 extra under the piano corner (front-left)</td></tr>
+      <tr><td>Layout</td><td>32 feet — one every ~840 along the deck’s four support lines, plus 4 extra under the piano (left of the door)</td></tr>
       <tr><td>Levelling</td><td>rubber square under each base, then wind each foot to a laser line — ≈25 on the floor’s high spot, up to ≈55 at the low ends</td></tr>
     </table>
   </section>
@@ -334,7 +336,12 @@ const slabH = x => {                           // warehouse slab profile: crown 
   return x <= PK ? AMP*(1-Math.cos(Math.PI*(x-X0)/(PK-X0)))/2
                  : AMP*(1-Math.cos(Math.PI*(X1-x)/(X1-PK)))/2;
 };
-const FLOOR_TOP = LIFT + T, WALL_TOP = FLOOR_TOP + H; // 140, 2630
+const FLOOR_TOP = LIFT + T, WALL_TOP = FLOOR_TOP + H; // 145, 2635
+/* window in Wall B above the piano: reclaimed timber frame with fixed glass,
+   1800 × 850 × 140 deep laid on its side. my* = mm down from the top plank.
+   Rough opening 1820 × 870; frame sill 1300 above the deck (50 over the piano) */
+const WIN = {x0:644, x1:2464, my0:330, my1:1200, fx0:654, fx1:2454, fy0:340, fy1:1190, depth:140};
+WIN.yLo = WALL_TOP - WIN.my1; WIN.yHi = WALL_TOP - WIN.my0;
 const RED = [214, 69, 65];
 
 /* ---------- solid builders ---------- */
@@ -382,14 +389,23 @@ const wallBMembers = (() => {
   const m = [];
   m.push([0,0,5035,35]);                                     // top plank
   m.push([0,2455,3018,35]); m.push([3908,2455,1127,35]);     // bottom plank, cut at the door
-  for (const x of [0,591,1182,1773,2382,2982,4182,4782,4999]) m.push([x,35,36,2420]);
+  for (const x of [0,572,2982,4182,4782,4999]) m.push([x,35,36,2420]);
   m.push([3908,35,36,2420]);                                 // new door-side upright
   m.push([3582,35,36,313]);                                  // old upright, kept above the header
   m.push([3018,348,890,35]);                                 // header over the opening
+  // window over the piano: kings, trimmers, doubled header, sill; the old
+  // uprights at 591 / 1182 / 1773 are cut short above and below it
+  // (the upright at 572 is the left king; a new right king goes in at 2500)
+  m.push([2500,35,36,2420]);                                   // right king stud
+  m.push([608,330,36,2125]); m.push([2464,330,36,2125]);       // trimmers carrying the header
+  m.push([608,240,1892,90]);                                   // header: two planks on edge
+  m.push([644,1200,1820,35]);                                  // sill plank
+  for (const x of [1182,1773,2382]){ m.push([x,35,36,205]); m.push([x,1235,36,1220]); }
   for (const y of [478,1268,2059])
-    for (const [x,w] of [[36,555],[1218,555],[2418,564],[3944,238],[4818,181]]) m.push([x,y,w,36]);
-  for (const y of [877,1755])
-    for (const [x,w] of [[627,555],[1809,573],[4218,564]]) m.push([x,y,w,36]);
+    for (const [x,w] of [[36,536],[2536,446],[3944,238],[4818,181]]) m.push([x,y,w,36]);
+  m.push([4218,877,564,36]); m.push([4218,1755,564,36]);
+  for (const y of [1268,2059]) m.push([1218,y,555,36]);        // under the sill
+  m.push([644,1755,538,36]); m.push([1809,1755,573,36]);
   // (the door leaf itself is its own translucent layer — see the 'door' panel)
   // jamb (the frame the door hangs in): two legs + a head piece, 30 thick,
   // packed off the structure with plastic packers
@@ -485,6 +501,11 @@ const roofMembers = [
   [2795,1750,1102,35], [3932,1750,1068,35],
 ];
 
+const windowFrameMembers = [
+  [654,340,1800,70,0,5], [654,1120,1800,70,0,5],   // head and sill of the frame
+  [654,410,70,710,0,5], [2384,410,70,710,0,5],     // sides
+];
+
 function buildPanel(members, map){
   const out = [];
   for (const [mx,my,w,h,tier,red] of members){
@@ -493,6 +514,7 @@ function buildPanel(members, map){
     if (red === 2){ for (const f of faces) f.col = [122,92,64]; }      // door leaf
     else if (red === 3){ for (const f of faces) f.col = [156,124,88]; } // door jamb
     else if (red === 4){ for (const f of faces) f.col = [214,178,88]; } // packers
+    else if (red === 5){ for (const f of faces) f.col = [185,138,106]; } // window frame
     else if (red) for (const f of faces) f.red = true;
     out.push(...faces);
   }
@@ -533,8 +555,12 @@ const panels = [
       faces.push(...box(x+S,x+w-S, Y0+S,Y1-S, T+S,T+OT2-S));
     // Wall B lining is cut around the doorway, with a strip above the door
     const xsB = [[90,1110],[1200,1200],[2400,618],[3018,890,FLOOR_TOP+2107],[3908,892],[4800,145]];
-    for (const [x,w,y0] of xsB)
-      faces.push(...box(x+S,x+w-S, (y0||Y0)+S,Y1-S, W-T-OT2+S,W-T-S));
+    const osbB = (a,b,c,d) => { if (b-a > 1 && d-c > 1) faces.push(...box(a+S,b-S, c+S,d-S, W-T-OT2+S,W-T-S)); };
+    for (const [x,w,y0] of xsB){
+      const yb = y0 || Y0, a = Math.max(x,WIN.x0), b = Math.min(x+w,WIN.x1);
+      if (b > a){ osbB(x,a,yb,Y1); osbB(b,x+w,yb,Y1); osbB(a,b,yb,WIN.yLo); osbB(a,b,WIN.yHi,Y1); } // hole cut for the window
+      else osbB(x,x+w,yb,Y1);
+    }
     for (const [z,w] of zsEnd){
       faces.push(...box(T+S,T+OT2-S, Y0+S,Y1-S, z+S,z+w-S));
       faces.push(...box(L-T-OT2+S,L-T-S, Y0+S,Y1-S, z+S,z+w-S));
@@ -633,7 +659,7 @@ const panels = [
     const spots = [];
     for (const sx of [100, 940, 1780, 2620, 3460, 4300, 4935])
       for (const sz of [50, 1552, 2500, 3485]) spots.push([sx, sz]); // incl. the new blocking line
-    spots.push([520, 3485], [1360, 3485], [472, 2815], [1382, 2815]); // piano zone
+    spots.push([1360, 3485], [2200, 3485], [1000, 2815], [1900, 2815]); // piano zone
     const faces = [];
     for (const [sx, sz] of spots){
       const g = slabH(sx);
@@ -650,8 +676,8 @@ const panels = [
   /* piano: ~300 kg upright, front-left against Wall B — the reason for the
      extra feet in that corner */
   {id:'piano', label:'Piano spot', color:'#8a4750', alpha:0.35, on:true, noChip:true,
-   faces:box(300,1800, 145,1395, 2825,3425),
-   tag:{p:[1050, 1470, 3125], t:'piano · ~300 kg'}},
+   faces:box(804,2304, 145,1395, 2825,3425),
+   tag:{p:[1554, 1470, 3125], t:'piano · ~300 kg'}},
   /* outer room: the warehouse — 7000 × 7000 inside. Studio tucked into the
      corner with a 20 gap on both sides. Ceiling: 3050 at the tall wall, falling
      280 over the studio's 5035 stretch (pitch 280/5035) and continuing to
@@ -675,6 +701,23 @@ const panels = [
   {id:'door', label:'Door', color:'#7a5c40', alpha:0.55, on:true, noChip:true,
    faces:buildPanel([[3053,450,820,2040]], (mx,my,w,h)=>{ const [y0,y1]=wallY(my,h); return wbox(mx,mx+w, y0,y1, W-T,W); }),
    tag:null},
+  /* the window: timber frame 140 deep, flush with Wall B's outside face (so it
+     stands 38 into the room past the OSB), fixed glass in the middle */
+  (() => {
+    const faces = [];
+    for (const [mx,my,w,h] of windowFrameMembers){
+      const [y0,y1] = wallY(my,h);
+      const b = box(mx+S,mx+w-S, y0+S,y1-S, W-WIN.depth+S,W-S);
+      for (const f of b) f.col = [185,138,106];
+      faces.push(...b);
+    }
+    const [g0,g1] = wallY(410,710);
+    const g = box(724,2384, g0,g1, W-75,W-69);
+    for (const f of g){ f.col = [150,190,205]; f.glass = true; }
+    faces.push(...g);
+    return {id:'window', label:'Window', color:'#b98a6a', on:true, noChip:true, faces,
+      tag:{p:[1554, WALL_TOP-765, W], t:'window · 1800 × 850'}};
+  })(),
   /* chipboard floor boards laid on the deck, colour-coded per piece */
   (() => {
     const y0 = FLOOR_TOP, faces = [];
@@ -703,7 +746,7 @@ const flatDeck = (members, ox, oz) => buildPanel(members, (mx,my,w,h)=> box(ox+m
     floor:{f:()=>flatDeck([...deckMembers, ...deckBlocking],0,0), tag:[2517,1767], t:'Floor deck · 5035 × 3535'},
     roof: {f:()=>flatDeck(roofMembers,0,4200),    tag:[2517,5950],  t:'Roof · 5035 × 3535'},
     wallA:{f:()=>flatWall(longWallMembers,5835,0),   tag:[8352,1245],  t:'Wall A · 5035 × 2490'},
-    wallB:{f:()=>flatWall([...wallBMembers, [3053,450,820,2040,0,2]],5835,3350),tag:[8352,4595],  t:'Wall B · 5035 × 2490 · door'},
+    wallB:{f:()=>flatWall([...wallBMembers, [3053,450,820,2040,0,2], ...windowFrameMembers],5835,3350),tag:[8352,4595],  t:'Wall B · 5035 × 2490 · door'},
     front:{f:()=>flatWall(endWallMembers,5835,6700), tag:[7512,7945],  t:'Front · 3355 × 2490'},
     back: {f:()=>flatWall(endWallMembers,9755,6700), tag:[11432,7945], t:'Back · 3355 × 2490'},
   };
@@ -793,6 +836,8 @@ const netDims = [
   {a:[0,0,3535], b:[5035,0,3535], off:[0,0,320], t:'5035', need:['boards']},
   {a:[0,0,0], b:[0,0,3535], off:[-320,0,0], t:'3535', need:['boards']},
   {a:[0,0,0], b:[2990,0,0], off:[0,0,-300], t:'2990', need:['boards']},
+  {a:[6489,0,3830], b:[8289,0,3830], off:[0,0,0], t:'1800', need:['wallB']},
+  {a:[6489,0,3690], b:[6489,0,4540], off:[0,0,0], t:'850', need:['wallB']},
 ];
 let netMode = false, cam3d = null;
 
@@ -827,6 +872,9 @@ const isoDims = {
     {a:[0,FLOOR_TOP,W], b:[L,FLOOR_TOP,W], off:[0,0,380], t:'5035'},
     {a:[0,FLOOR_TOP,W], b:[0,WALL_TOP,W], off:[-380,0,0], t:'2490'},
     {a:[L,FLOOR_TOP,W-T], b:[L,FLOOR_TOP,W], off:[300,0,0], t:'90'},
+    {a:[654,WALL_TOP-340,W-T], b:[2454,WALL_TOP-340,W-T], off:[0,0,-300], t:'1800'},
+    {a:[2454,WALL_TOP-1190,W-T], b:[2454,WALL_TOP-340,W-T], off:[260,0,-200], t:'850'},
+    {a:[2454,FLOOR_TOP,W-T], b:[2454,WALL_TOP-1190,W-T], off:[260,0,-200], t:'1300'},
     {a:[3053,FLOOR_TOP,W-T], b:[3873,FLOOR_TOP,W-T], off:[0,0,-320], t:'820'},
     {a:[3873,FLOOR_TOP,W-T], b:[3873,FLOOR_TOP+2040,W-T], off:[320,0,-160], t:'2040'},
   ],
@@ -852,6 +900,12 @@ const isoDims = {
     {a:[-20,0,6300], b:[3357,0,6300], off:[0,0,340], t:'3377'},
     {a:[3357,0,6300], b:[6980,0,6300], off:[0,0,340], t:'3623'},
     {a:[3357,0,-20], b:[3357,30,-20], off:[0,0,-340], t:'+30'},
+  ],
+  window: [
+    {a:[654,WALL_TOP-340,W], b:[2454,WALL_TOP-340,W], off:[0,0,380], t:'1800'},
+    {a:[2454,WALL_TOP-1190,W], b:[2454,WALL_TOP-340,W], off:[300,0,240], t:'850'},
+    {a:[WIN.x1+0,WALL_TOP-WIN.my1,W-T], b:[WIN.x0,WALL_TOP-WIN.my1,W-T], off:[0,0,-300], t:'1820'},
+    {a:[2454,FLOOR_TOP,W], b:[2454,WALL_TOP-1190,W], off:[300,0,240], t:'1300'},
   ],
   door: [
     {a:[3053,FLOOR_TOP,W-T], b:[3873,FLOOR_TOP,W-T], off:[0,0,-320], t:'820'},
@@ -983,7 +1037,9 @@ function initGL(){
   }
   for (const p of panels){
     const base = [1,3,5].map(i=>parseInt(p.color.slice(i,i+2),16));
-    p.gl3 = pack(p.faces, base);
+    const glass = p.faces.filter(f => f.glass);
+    p.gl3 = pack(glass.length ? p.faces.filter(f => !f.glass) : p.faces, base);
+    if (glass.length) p.gl3g = pack(glass, base);
     if (p.flatFaces) p.glf = pack(p.flatFaces, base);
   }
 }
@@ -1047,6 +1103,11 @@ function render(){
         gl.uniform4f(U.uTint, 1,1,1, Math.min(1, hoverPanel===p.id ? p.alpha+0.14 : p.alpha));
         gl.uniform1f(U.uBright, hoverPanel===p.id ? 1.2 : 1);
         bindDraw(p.gl3.triBuf, p.gl3.triN, gl.TRIANGLES);
+      }
+      for (const p of panels){ if (!shown(p) || !p.gl3g) continue;
+        gl.uniform4f(U.uTint, 1,1,1, 0.38);
+        gl.uniform1f(U.uBright, hoverPanel===p.id ? 1.2 : 1);
+        bindDraw(p.gl3g.triBuf, p.gl3g.triN, gl.TRIANGLES);
       }
       gl.depthMask(true);
     }
@@ -1205,7 +1266,7 @@ function setPanel(id, on){
   if (isolated) isolated = null;
   const p = panels.find(q=>q.id===id); p.on=on;
   if (id === 'man') panels.find(q=>q.id==='piano').on = on; // person + piano share a toggle
-  if (id === 'wallB') panels.find(q=>q.id==='door').on = on; // door travels with its wall
+  if (id === 'wallB'){ panels.find(q=>q.id==='door').on = on; panels.find(q=>q.id==='window').on = on; } // door and window travel with their wall
   const chip = document.getElementById('chip-'+id);
   if (chip) chip.setAttribute('aria-pressed', String(on));
   if (hoverPanel===id && !on) hoverPanel=null;
