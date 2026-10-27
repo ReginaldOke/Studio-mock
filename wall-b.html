@@ -162,7 +162,7 @@
     <ul class="changes" style="margin-top:12px">
       <li>I've read <span class="mono">5030</span> as the overall room length (floor and roof), which leaves the 4980 wall 25 short at each end. If 5030 means something else, tell me and I'll redraw.</li>
       <li>The studio is 55 lower overall, so it now clears the sloping warehouse ceiling at the far corner by about 100 instead of about 44.</li>
-      <li>The door opening is 935 × 2110: a 30 frame each side, 7 packers, 3 gaps around the door and 12 under it for a drop seal. The door hinges on the right (seen from outside) and opens out; 1080 of wall beyond it lets it fold flat.</li>
+      <li>The door opening is 935 × 2110: a 30 frame each side, 7 packers, 3 gaps around the door and 12 under it for a drop seal. The door opens into the room, hinged on the right as seen from outside (the left from inside). It folds back against the inside of the wall towards the end wall, which has about 990 of clear wall for an 855 door; keep that stretch free of gear and panels. Hinge pins end up inside the room, and the stop goes on the outside edge of the frame.</li>
       <li>The window sits between the left end and the door, within 35 of centred so the bays stay 405, with the bottom of its frame 1300 off the floor. At 137 deep it stands 35 into the room past the OSB.</li>
       <li>Studs are at 440 centres so most gaps are exactly 405 and the crosspieces are cut 405, close to the back wall's spacing (12 uprights at about 450 centres). Like the back wall there's one staggered row of crosspieces; its underside is 1160 above the bottom plate, so a standard 1160 batt fits below it without cutting. Four full-height bays and four under the window take whole-width batts. The odd ones are flagged in red on the drawing: a 445 bay at the right end (a batt plus a 40 strip), a 60 slot under the window, and the short strips above the openings.</li>
       <li>Only this wall is updated. The 3D room model and the other walls still use the old sizes.</li>
@@ -304,11 +304,11 @@ function draw(){
     el('rect', {x:X(DX+px, pw), y:SY(12+py+ph), width:pw, height:ph, fill:'none', stroke:'var(--leaf)', 'stroke-width':4, opacity:.6, 'pointer-events':'none'});
   // swing symbol: lines meet on the hinge side; solid when the door opens towards you
   const hx = X(DX+DW), lx = X(DX), sy0 = SY(12), sy1 = SY(12+DH), sym = (sy0+sy1)/2;
-  el('path', {class:'swing', d:`M${lx} ${sy0} L${hx} ${sym} L${lx} ${sy1}`, 'stroke-dasharray': inside ? '26 18' : 'none', 'pointer-events':'none'});
+  el('path', {class:'swing', d:`M${lx} ${sy0} L${hx} ${sym} L${lx} ${sy1}`, 'stroke-dasharray': inside ? 'none' : '26 18', 'pointer-events':'none'});
   el('circle', {cx:X(DX+60), cy:SY(1000), r:28, fill:'var(--ink2)', 'pointer-events':'none'});
   for (const y of [200,1030,1860]) el('rect', {x:X(DX+DW-4,8), y:SY(y+50), width:8, height:100, fill:'var(--ink)', 'pointer-events':'none'});
   text(X(DX+DW/2), SY(1100), 'door 855 × 2060', 'lbl2');
-  text(X(DX+DW/2), SY(1040), inside ? 'opens away from you' : 'opens towards you', 'lbl2');
+  text(X(DX+DW/2), SY(1040), inside ? 'opens towards you' : 'opens away from you', 'lbl2');
   // where the end walls butt in
   for (const x0 of [0, L-90]) el('rect', {class:'ghost', x:X(x0,90), y:SY(H), width:90, height:H, 'pointer-events':'none'});
   // labels above the wall
@@ -384,8 +384,8 @@ for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','
   r(0,2200,90,H-70-2200,'var(--crip)');
   r(0,2110,35,90,'var(--head)'); r(35,2110,20,90,'var(--ply)'); r(55,2110,35,90,'var(--head)');
   r(0,2105,102,5,'var(--pack)'); r(0,2075,102,30,'var(--jamb)');
-  r(40,2045,12,30,'var(--jamb)');
-  r(0,1990,40,82,'var(--leaf)', {opacity:.55});
+  r(50,2045,12,30,'var(--jamb)');
+  r(62,1990,40,82,'var(--leaf)', {opacity:.55});
   r(90,2113,12,H-12-2113,'var(--osb)');
   const lead = (x1,y1,x2,y2) => el('path', {class:'d-lead', d:`M${x1} ${Y(y1)} L${x2} ${Y(y2)}`}, g);
   lead(80,H-18,190,H-18); t(198,Y(H-18)+5,'top plates, 2 × 35');
@@ -394,7 +394,7 @@ for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','
   lead(80,2155,190,2190); t(198,Y(2190)+5,'double header, 2 × 90×35 on edge');
   t(198,Y(2190)+24,'with a 20 ply strip between','d-lbl2');
   lead(97,2090,190,2090); t(198,Y(2090)+5,'door frame head (30) on packers');
-  lead(20,2020,190,2020); t(198,Y(2020)+5,'door, 40 thick, closes onto the stop','d-lbl2');
+  lead(82,2020,190,2020); t(198,Y(2020)+5,'door, 40 thick, closes onto the stop from inside','d-lbl2');
   t(-50,Y(1990)+30,'outside','d-lbl2'); t(60,Y(1990)+30,'inside','d-lbl2');
   const dg = el('g', {class:'dim'}, g);
   el('line', {x1:-30, y1:Y(2110), x2:-30, y2:Y(H), style:'stroke-width:1.5'}, dg);
