@@ -51,7 +51,8 @@
   .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
   .sheet{padding:12px 12px 10px}
   .draw{overflow-x:auto; -webkit-overflow-scrolling:touch}
-  .draw svg{display:block; width:100%; min-width:860px; height:auto}
+  .draw svg{display:block; width:100%; height:auto}
+  .zoomonly{display:none}
   .legend{display:flex; flex-wrap:wrap; gap:6px 14px; padding:8px 6px 2px; font-size:12px; color:var(--ink2)}
   .legend span{display:inline-flex; align-items:center; gap:6px}
   .legend i{width:12px; height:12px; border-radius:3px; display:inline-block; border:1px solid var(--edge)}
@@ -82,7 +83,9 @@
   .lbl2{font:500 48px var(--f-mono); fill:var(--ink2); paint-order:stroke; stroke:var(--halo); stroke-width:12; stroke-linejoin:round}
   .bayok{font:600 50px var(--f-mono); fill:var(--ink2)}
   .bayodd{font:700 50px var(--f-mono); fill:var(--accent)}
-  .ctrls{display:flex; flex-wrap:wrap; align-items:center; gap:8px}
+  .ctrls{display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px}
+  .pair{display:inline-flex; flex-wrap:wrap; align-items:center; gap:6px 0}
+  .seglabel, .seg button{white-space:nowrap}
   .tiegrid{display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:18px; align-items:start}
   @media (max-width:760px){ .tiegrid{grid-template-columns:minmax(0,1fr)} }
   .tiegrid svg{display:block; width:100%; height:auto}
@@ -114,6 +117,17 @@
   .d-lead{stroke:var(--ink2); stroke-width:1.2; fill:none}
   .d-m{stroke:var(--edge); stroke-width:1.2}
   @media (prefers-reduced-motion: no-preference){ .m{transition:stroke-width .12s} }
+  /* small screens: the whole wall fits the width; only the key sizes stay, drawn larger */
+  @media (max-width:640px){
+    .zoomonly{display:inline-block}
+    .draw:not(.zoomed) #elev .lbl2, .draw:not(.zoomed) #elev .bayok, .draw:not(.zoomed) #elev .bayodd{display:none}
+    .draw:not(.zoomed) #elev .dtxt{font-size:150px; stroke-width:34}
+    .draw:not(.zoomed) #elev .lbl{font-size:120px; stroke-width:28}
+    .draw.zoomed svg{width:300%}
+    .d-lbl{font-size:18px} .d-lbl2{font-size:16px}
+    .tlbl{font-size:50px} .tlbl2{font-size:44px} .tdim{font-size:46px}
+    .pcap{flex-basis:100%}
+  }
 </style>
 
 <div class="wrap">
@@ -123,13 +137,13 @@
       <p class="sub">Front wall, with the door · 4980 long × 2435 high · uprights spaced for 405 insulation · all sizes in mm</p>
     </div>
     <div class="ctrls">
-      <span class="seglabel">Looking from</span>
+      <span class="pair"><span class="seglabel">Looking from</span>
       <span class="seg" role="group" aria-label="Viewing side">
         <button id="vOut" aria-pressed="true">Outside the studio</button>
         <button id="vIn" aria-pressed="false">Inside the room</button>
-      </span>
-      <span class="seglabel" style="margin-left:10px">Show</span>
-      <span class="seg"><button id="tieBtn" aria-pressed="true">Lift plank</button></span>
+      </span></span>
+      <span class="pair"><span class="seglabel">Show</span>
+      <span class="seg"><button id="tieBtn" aria-pressed="true">Lift plank</button></span></span>
     </div>
   </header>
 
@@ -139,6 +153,7 @@
       <button id="pPrev" class="pbtn" aria-label="Previous step" disabled>‹</button>
       <button id="pNext" class="pbtn" aria-label="Next step">›</button>
       <button id="pReset" class="pbtn" hidden>Show whole wall</button>
+      <button id="pZoom" class="pbtn zoomonly" aria-pressed="false">Zoom in</button>
       <div class="pcap" id="pCap" aria-live="polite"><b>Build order</b><span>Press play to see which pieces get screwed together first.</span></div>
     </div>
     <div class="draw"><svg id="elev" role="img" aria-label="Framing elevation of Wall B with the door and window"></svg></div>
@@ -259,7 +274,7 @@ add(L-125,35,90,STUD,'cal','Corner strip','an extra upright laid flat on the ins
 // window: gap 600–2420 × 1290–2155, frame 1800 × 845 with its bottom at 1300
 add(565,35,T,2120,'trim','Beam support','holds up the beam over the window',2120);
 add(2420,35,T,2120,'trim','Beam support','holds up the beam over the window',2120);
-add(565,2155,1890,70,'head','Beam over the window','two planks laid flat, one on top of the other, screwed together',1890,2);
+for (const y of [2155,2190]) add(565,y,1890,35,'head','Beam over the window','one of two planks laid flat, one on top of the other, screwed together',1890);
 add(600,1255,1820,35,'sill','Plank under the window','laid flat; the window sits on it',1820);
 for (const x of [1005,1445,1885,2325]){
   add(x,35,T,1220,'crip','Short upright','under the window, 405 apart',1220);
@@ -268,7 +283,7 @@ for (const x of [1005,1445,1885,2325]){
 // door: gap 2965–3900 × 0–2110
 add(2930,35,T,2075,'trim','Beam support','holds up the beam over the door',2075);
 add(3900,35,T,2075,'trim','Beam support','holds up the beam over the door',2075);
-add(2930,2110,1005,70,'head','Beam over the door','two planks laid flat, one on top of the other, screwed together',1005,2);
+for (const y of [2110,2145]) add(2930,y,1005,35,'head','Beam over the door','one of two planks laid flat, one on top of the other, screwed together',1005);
 for (const x of [3335,3775]) add(x,2180,T,H-70-2180,'crip','Short upright','between the beam and the top planks',H-70-2200);
 // crosspieces: 405 long, stepped by a plank so both ends can be nailed;
 // the lower edge at 1195 leaves exactly 1160 (one standard batt) above the bottom plank
@@ -511,6 +526,13 @@ pPlay.addEventListener('click', () => {
 pPrev.addEventListener('click', () => { stopPlay(); goStep(curStep - 1 || 1); stopPlay(); });
 pNext.addEventListener('click', () => { stopPlay(); goStep(curStep + 1); stopPlay(); });
 pReset.addEventListener('click', () => { stopPlay(); goStep(0); stopPlay(); });
+const pZoom = document.getElementById('pZoom'), drawBox = document.querySelector('.draw');
+pZoom.addEventListener('click', () => {
+  const z = drawBox.classList.toggle('zoomed');
+  pZoom.textContent = z ? 'Fit whole wall' : 'Zoom in';
+  pZoom.setAttribute('aria-pressed', String(z));
+  if (z) drawBox.scrollLeft = (drawBox.scrollWidth - drawBox.clientWidth) / 2;
+});
 const tieBtn = document.getElementById('tieBtn');
 tieBtn.addEventListener('click', () => { showTie = !showTie; tieBtn.setAttribute('aria-pressed', String(showTie)); draw(); if (sel !== null) show(sel); });
 
