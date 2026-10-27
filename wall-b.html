@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wall B Framing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* layout: a drafting sheet — one wide elevation band on top, details and schedules in a two-column grid below */
+  :root{
+    --bg:#eef0ec; --card:#f8f9f6; --ink:#26292b; --ink2:#5f6468; --line:rgba(38,41,43,.16);
+    --accent:#c14e38; --accent-soft:rgba(193,78,56,.12); --halo:#f8f9f6; --edge:rgba(38,41,43,.55);
+    --cavity:#e3e6e0; --hi:#ffffff;
+    --plate:#7f96ad; --stud:#86ab8c; --trim:#5d9468; --crip:#b4cfb8; --cal:#3d8a84; --nog:#d9a05e;
+    --head:#a8653a; --sill:#9db0c2; --jamb:#9c7c58; --pack:#d6b258; --leaf:#7a5c40;
+    --frame:#b98a6a; --glass:#8fb4c4; --osb:#c9a25e; --ply:#cdb48a;
+    --f-display:'Archivo', system-ui, -apple-system, sans-serif;
+    --f-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15181c; --card:#1c2025; --ink:#e9e7e2; --ink2:#9aa0a6; --line:rgba(233,231,226,.14);
+      --accent:#ff8a68; --accent-soft:rgba(255,138,104,.14); --halo:#1c2025; --edge:rgba(6,8,10,.7);
+      --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15181c; --card:#1c2025; --ink:#e9e7e2; --ink2:#9aa0a6; --line:rgba(233,231,226,.14);
+    --accent:#ff8a68; --accent-soft:rgba(255,138,104,.14); --halo:#1c2025; --edge:rgba(6,8,10,.7);
+    --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink); font-family:var(--f-display); font-size:14px; line-height:1.5;
+    padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px));
+    padding-block:20px 40px;
+  }
+  .wrap{max-width:1240px; margin:0 auto; display:grid; gap:18px}
+  .wrap > *{min-width:0}
+  header.top{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px 20px}
+  h1{margin:0; font-size:26px; font-weight:800; letter-spacing:-.015em; text-wrap:balance}
+  .sub{margin:2px 0 0; color:var(--ink2); font-size:13px}
+  .mono{font-family:var(--f-mono); font-variant-numeric:tabular-nums}
+  .seg{display:inline-flex; border:1px solid var(--line); border-radius:9px; padding:3px; background:var(--card); gap:3px}
+  .seg button{appearance:none; border:0; background:transparent; color:var(--ink2); font:600 13px var(--f-display);
+    padding:7px 13px; border-radius:6px; cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--accent-soft); color:var(--accent)}
+  .seg button:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+  .seglabel{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink2); margin-right:8px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .sheet{padding:12px 12px 10px}
+  .draw{overflow-x:auto; -webkit-overflow-scrolling:touch}
+  .draw svg{display:block; width:100%; min-width:860px; height:auto}
+  .legend{display:flex; flex-wrap:wrap; gap:6px 14px; padding:8px 6px 2px; font-size:12px; color:var(--ink2)}
+  .legend span{display:inline-flex; align-items:center; gap:6px}
+  .legend i{width:12px; height:12px; border-radius:3px; display:inline-block; border:1px solid var(--edge)}
+  .info{display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; border-top:1px solid var(--line);
+    margin-top:8px; padding:9px 6px 2px; min-height:38px; font-size:13px}
+  .info b{font-weight:700}
+  .info .mono{color:var(--ink2)}
+  .grid{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:18px}
+  @media (max-width:760px){ .grid{grid-template-columns:minmax(0,1fr)} h1{font-size:22px} }
+  h2{margin:0 0 10px; font-size:12px; text-transform:uppercase; letter-spacing:.09em; color:var(--ink2); font-weight:700}
+  .detail svg{display:block; width:100%; height:auto}
+  .cap{margin:8px 0 0; font-size:12.5px; color:var(--ink2); max-width:62ch}
+  .tbl{overflow-x:auto}
+  table{width:100%; border-collapse:collapse; font-size:13px}
+  th,td{text-align:left; padding:6px 8px 6px 0; border-top:1px solid var(--line); vertical-align:top}
+  th{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--ink2); font-weight:600; border-top:0}
+  td.n{text-align:right; white-space:nowrap}
+  tfoot td{font-weight:700}
+  .sw{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:7px; vertical-align:-1px; border:1px solid var(--edge)}
+  ul.changes{margin:0; padding-left:18px; display:grid; gap:6px; font-size:13.5px; max-width:70ch}
+  /* drawing classes */
+  .m{stroke:var(--edge); stroke-width:3; cursor:pointer}
+  .m:hover, .m.sel{stroke:var(--accent); stroke-width:9}
+  .dim line{stroke:var(--accent); stroke-width:4}
+  .dim .ext{stroke:var(--accent); stroke-width:2.5; opacity:.55}
+  .dtxt{font:500 62px var(--f-mono); fill:var(--accent); paint-order:stroke; stroke:var(--halo); stroke-width:16; stroke-linejoin:round}
+  .lbl{font:500 56px var(--f-mono); fill:var(--ink); paint-order:stroke; stroke:var(--halo); stroke-width:14; stroke-linejoin:round}
+  .lbl2{font:500 48px var(--f-mono); fill:var(--ink2); paint-order:stroke; stroke:var(--halo); stroke-width:12; stroke-linejoin:round}
+  .ghost{fill:none; stroke:var(--ink2); stroke-width:4; stroke-dasharray:22 16; opacity:.7}
+  .swing{fill:none; stroke:var(--ink2); stroke-width:4}
+  .ground{stroke:var(--ink2); stroke-width:6}
+  .d-lbl{font:500 15px var(--f-mono); fill:var(--ink)}
+  .d-lbl2{font:500 13px var(--f-mono); fill:var(--ink2)}
+  .d-lead{stroke:var(--ink2); stroke-width:1.2; fill:none}
+  .d-m{stroke:var(--edge); stroke-width:1.2}
+  @media (prefers-reduced-motion: no-preference){ .m{transition:stroke-width .12s} }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Wall B framing</h1>
+      <p class="sub">The door wall · 5035 long × 2490 high · 90×35 planks · all sizes in mm</p>
+    </div>
+    <div>
+      <span class="seglabel">Looking from</span>
+      <span class="seg" role="group" aria-label="Viewing side">
+        <button id="vIn" aria-pressed="true">Inside the room</button>
+        <button id="vOut" aria-pressed="false">The warehouse</button>
+      </span>
+    </div>
+  </header>
+
+  <section class="card sheet" aria-label="Wall B elevation">
+    <div class="draw"><svg id="elev" role="img" aria-label="Framing elevation of Wall B with the door and window"></svg></div>
+    <div class="legend" id="legend"></div>
+    <div class="info" id="info"><b>Tap any piece</b><span>to see what it is and the length to cut.</span></div>
+  </section>
+
+  <div class="grid">
+    <section class="card detail">
+      <h2>California corner · plan view</h2>
+      <svg viewBox="-40 -110 800 560" role="img" aria-label="Plan view of the California corner at the end of Wall B">
+        <text class="d-lbl2" x="0" y="-70">outside (warehouse)</text>
+        <rect x="-40" y="0" width="340" height="90" fill="var(--cavity)"/>
+        <rect x="0" y="90" width="90" height="350" fill="var(--cavity)"/>
+        <rect class="d-m" x="0" y="0" width="36" height="90" fill="var(--stud)"/>
+        <rect class="d-m" x="36" y="55" width="90" height="35" fill="var(--cal)"/>
+        <rect class="d-m" x="0" y="90" width="90" height="36" fill="var(--stud)"/>
+        <rect class="d-m" x="90" y="90" width="210" height="12" fill="var(--osb)"/>
+        <rect class="d-m" x="90" y="102" width="12" height="338" fill="var(--osb)"/>
+        <text class="d-lbl2" x="170" y="300">room</text>
+        <path class="d-lead" d="M18 30 L330 20"/><text class="d-lbl" x="338" y="25">Wall B end stud</text>
+        <path class="d-lead" d="M80 70 L330 80"/><text class="d-lbl" x="338" y="85">flat stud on the inside face</text>
+        <path class="d-lead" d="M110 96 L330 145"/><text class="d-lbl" x="338" y="150">OSB edge nails in here (36)</text>
+        <path class="d-lead" d="M45 112 L330 215"/><text class="d-lbl" x="338" y="220">front wall end stud,</text>
+        <text class="d-lbl2" x="338" y="240">screwed through into the flat stud</text>
+        <path class="d-lead" d="M45 330 L330 330"/><text class="d-lbl" x="338" y="335">front wall (90 deep)</text>
+        <text class="d-lbl2" x="-30" y="430" transform="rotate(-90 -30 430)">90</text>
+      </svg>
+      <p class="cap">The front and back walls butt against Wall B's inside face, so Wall B's lining would have nothing to nail into at the corner. A second stud laid flat beside the end stud gives it a 36 wide nailing strip and something solid to screw the end wall into. The same detail is mirrored at the back-wall end.</p>
+    </section>
+
+    <section class="card detail">
+      <h2>Over the door · section</h2>
+      <svg viewBox="-60 -40 720 600" role="img" aria-label="Section through the double top plate and the double header over the door">
+        <g id="sect"></g>
+      </svg>
+      <p class="cap">Both openings get a header made of two planks stood on edge with a 20 strip of ply between them, which makes it exactly 90 thick to match the wall. Stood on edge, two planks are far stiffer than two laid flat, which matters over the 1.8 m window. The double top plate runs the full 5035.</p>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>What changed from the room model</h2>
+    <ul class="changes">
+      <li><b>Double top plate.</b> Two 5035 plates on top. The wall stays 2490 high, so every stud is cut <span class="mono">2385</span> instead of 2420 and the roof still sits level on the other walls.</li>
+      <li><b>California corners</b> at both ends, on the inside face.</li>
+      <li><b>Double headers</b> over the door and window, each resting on its own side posts (trimmers), with short studs above to carry the top plates.</li>
+      <li><b>Door</b> is the 820 × 2030 × 40 solid door, hinged on the back-wall side and opening out into the warehouse. Opening 900 × 2080 leaves room for a 30 frame, packers, a 3 gap at the top and 12 underneath for a drop seal.</li>
+      <li><b>Window</b> (1800 × 850 on its side) is centred between the front wall and the door, with the bottom of the frame 1300 above the floor, just above the piano.</li>
+    </ul>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Cut list · Wall B</h2>
+      <div class="tbl"><table id="cut"></table></div>
+      <p class="cap">Plates need 5.4 m stock; studs come out of 2.4 m lengths with almost no waste. The header packers are 20 ply strips cut to the header length × 90.</p>
+    </section>
+    <section class="card">
+      <h2>Mark-out on the plates</h2>
+      <div class="tbl"><table id="mark"></table></div>
+      <p class="cap">Measured from the front-wall end to the near edge of each upright. Clamp the two plates together and mark them both at once.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const L = 5035, H = 2490, NS = 'http://www.w3.org/2000/svg';
+const TYPES = {
+  plate:{c:'--plate', n:'Plates'}, stud:{c:'--stud', n:'Full-height studs'}, cal:{c:'--cal', n:'California corner (flat stud)'},
+  trim:{c:'--trim', n:'Side posts (trimmers)'}, crip:{c:'--crip', n:'Short studs'}, head:{c:'--head', n:'Double headers'},
+  sill:{c:'--sill', n:'Window sill'}, nog:{c:'--nog', n:'Crosspieces'},
+  jamb:{c:'--jamb', n:'Door frame'}, pack:{c:'--pack', n:'Packers'}, frame:{c:'--frame', n:'Window frame'},
+};
+const M = [];   // x from the front-wall end, y up from the floor
+const add = (x,y,w,h,t,name,note,len,qty) => M.push({x,y,w,h,t,name,note,len,qty});
+// plates
+add(0,0,3054,35,'plate','Bottom plate','stops at the door opening',3054);
+add(3954,0,1081,35,'plate','Bottom plate','from the door to the back-wall end',1081);
+add(0,2420,L,35,'plate','Top plate','lower of the double top plate',L);
+add(0,2455,L,35,'plate','Top plate','upper of the double top plate',L);
+// full studs
+for (const [x,nm] of [[0,'End stud'],[590,'Window king stud'],[2518,'Window king stud'],[2982,'Door king stud'],
+  [3990,'Door king stud'],[4182,'Stud'],[4782,'Stud'],[4999,'End stud']])
+  add(x,35,36,2385,'stud',nm,'full height between plates',2385);
+// California corners
+add(36,35,90,2385,'cal','California corner','stud turned flat on the inside face, beside the end stud',2385);
+add(4909,35,90,2385,'cal','California corner','stud turned flat on the inside face, beside the end stud',2385);
+// window: opening 662–2482 × 1290–2160, frame 1800 × 850 with its bottom at 1300
+add(626,35,36,2125,'trim','Window side post','carries the window header',2125);
+add(2482,35,36,2125,'trim','Window side post','carries the window header',2125);
+add(626,2160,1892,90,'head','Window header','two 90×35 on edge + 20 ply packer',1892,2);
+add(662,1255,1820,35,'sill','Window sill','flat plank under the window',1820);
+for (const x of [1182,1773,2382]){
+  add(x,35,36,1220,'crip','Short stud','under the window sill',1220);
+  add(x,2250,36,170,'crip','Short stud','between the window header and the top plates',170);
+}
+// door: opening 3054–3954 × 0–2080
+add(3018,35,36,2045,'trim','Door side post','carries the door header',2045);
+add(3954,35,36,2045,'trim','Door side post','carries the door header',2045);
+add(3018,2080,972,90,'head','Door header','two 90×35 on edge + 20 ply packer',972,2);
+add(3582,2170,36,250,'crip','Short stud','between the door header and the top plates',250);
+// crosspieces, staggered between bays so each can be nailed through the studs
+const A = [400,1200,2000], B = [800,1600];
+for (const [x,w,rows] of [[126,464,A],[662,520,[800]],[1218,555,[400,1200]],[1809,573,[800]],
+  [2554,428,A],[4026,156,B],[4218,564,A]])
+  for (const y of rows) add(x,y,w,36,'nog','Crosspiece','cut to fit between the uprights',w);
+// door frame, packers (not plank stock)
+add(3061,0,30,2075,'jamb','Door frame leg','30 thick, packed off the posts',0);
+add(3917,0,30,2075,'jamb','Door frame leg','hinge side, 3 hinges',0);
+add(3061,2045,886,30,'jamb','Door frame head','',0);
+for (const y of [300,1000,1800]){ add(3054,y,7,80,'pack','Packer','plastic packer behind the frame',0); add(3947,y,7,80,'pack','Packer','plastic packer behind the frame',0); }
+add(3200,2075,80,5,'pack','Packer','',0); add(3760,2075,80,5,'pack','Packer','',0);
+// window frame
+for (const [x,y,w,h] of [[672,1300,1800,70],[672,2080,1800,70],[672,1370,70,710],[2402,1370,70,710]])
+  add(x,y,w,h,'frame','Window frame','reclaimed 1800 × 850 × 140, fixed glass',0);
+
+/* ---------- elevation ---------- */
+const svg = document.getElementById('elev');
+const VB = {x:-430, y:-330, w:L+860, h:H+330+640};
+svg.setAttribute('viewBox', `${VB.x} ${VB.y} ${VB.w} ${VB.h}`);
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]); (parent||svg).appendChild(e); return e; };
+const SY = y => H - y;
+let inside = true;
+try { inside = localStorage.getItem('wallb-view') !== 'out'; } catch(e){}
+const X = (x, w=0) => inside ? L - x - w : x;
+const info = document.getElementById('info');
+let sel = null;
+
+function text(x, y, s, cls, anchor='middle', rot){
+  const t = el('text', {x, y, class:cls, 'text-anchor':anchor});
+  if (rot) t.setAttribute('transform', `rotate(${rot} ${x} ${y})`);
+  t.textContent = s; return t;
+}
+function hdim(x1, x2, y, label, extFrom){ // y in wall coords (below floor = negative)
+  const a = X(x1), b = X(x2), g = el('g', {class:'dim'});
+  el('line', {x1:a, y1:SY(y), x2:b, y2:SY(y)}, g);
+  for (const p of [a,b]){
+    el('line', {x1:p-14, y1:SY(y)+14, x2:p+14, y2:SY(y)-14}, g);
+    if (extFrom !== undefined) el('line', {class:'ext', x1:p, y1:SY(extFrom), x2:p, y2:SY(y)+30}, g);
+  }
+  text((a+b)/2, SY(y)-22, label, 'dtxt');
+}
+function vdim(x, y1, y2, label, side=-1){
+  const a = X(x), g = el('g', {class:'dim'});
+  el('line', {x1:a, y1:SY(y1), x2:a, y2:SY(y2)}, g);
+  for (const y of [y1,y2]) el('line', {x1:a-14, y1:SY(y)+14, x2:a+14, y2:SY(y)-14}, g);
+  const tx = a + side*24, ty = (SY(y1)+SY(y2))/2;
+  text(tx, ty, label, 'dtxt', 'middle', -90);
+}
+
+function draw(){
+  svg.textContent = '';
+  // floor line
+  el('line', {class:'ground', x1:-300, y1:SY(0), x2:L+300, y2:SY(0)});
+  // members
+  M.forEach((m, i) => {
+    const r = el('rect', {x:X(m.x, m.w), y:SY(m.y+m.h), width:m.w, height:m.h,
+      fill:`var(${TYPES[m.t].c})`, class:'m' + (sel===i ? ' sel' : ''), tabindex: m.len ? 0 : -1});
+    r.dataset.i = i;
+  });
+  // glass + door leaf
+  el('rect', {x:X(742,1660), y:SY(2080), width:1660, height:710, fill:'var(--glass)', opacity:.45, 'pointer-events':'none'});
+  const dx = X(3094, 820);
+  el('rect', {x:dx, y:SY(2042), width:820, height:2030, fill:'var(--leaf)', opacity:.22, stroke:'var(--leaf)', 'stroke-width':5, 'pointer-events':'none'});
+  // the door's six panels
+  for (const [px,py,pw,ph] of [[110,140,250,600],[460,140,250,600],[110,880,250,650],[460,880,250,650],[110,1630,250,300],[460,1630,250,300]])
+    el('rect', {x:X(3094+px, pw), y:SY(12+py+ph), width:pw, height:ph, fill:'none', stroke:'var(--leaf)', 'stroke-width':4, opacity:.6, 'pointer-events':'none'});
+  // swing symbol: lines meet on the hinge side; solid when the door opens towards you
+  const hx = X(3914), lx = X(3094), sy0 = SY(12), sy1 = SY(2042), sym = (sy0+sy1)/2;
+  el('path', {class:'swing', d:`M${lx} ${sy0} L${hx} ${sym} L${lx} ${sy1}`, 'stroke-dasharray': inside ? '26 18' : 'none', 'pointer-events':'none'});
+  el('circle', {cx:X(3154), cy:SY(1000), r:28, fill:'var(--ink2)', 'pointer-events':'none'});
+  for (const y of [200,1015,1830]) el('rect', {x:X(3910,8), y:SY(y+50), width:8, height:100, fill:'var(--ink)', 'pointer-events':'none'});
+  text(X(3504), SY(1260), 'door 820 × 2030', 'lbl2');
+  text(X(3504), SY(1195), inside ? 'opens away from you' : 'opens towards you', 'lbl2');
+  // ends where the front and back walls butt in
+  for (const x0 of [0, L-90]) el('rect', {class:'ghost', x:X(x0,90), y:SY(H), width:90, height:H, 'pointer-events':'none'});
+  // labels above the wall
+  text(X(L/2), SY(H)-70, 'double top plate · 2 × 35', 'lbl');
+  text(X(45), SY(H)-70, 'front wall', 'lbl2', inside ? 'end' : 'start');
+  text(X(L-45), SY(H)-70, 'back wall', 'lbl2', inside ? 'start' : 'end');
+  text(X(81), SY(H)-150, 'California corner', 'lbl', inside ? 'end' : 'start');
+  text(X(L-81), SY(H)-150, 'California corner', 'lbl', inside ? 'start' : 'end');
+  text(X(1572), SY(2205)+20, '2 × 90×35 on edge', 'lbl2');
+  text(X(3504), SY(2125)+20, '2 × 90×35', 'lbl2');
+  text(X(1572), SY(1725)-60, 'window 1800 × 850', 'lbl2');
+  // dimensions
+  hdim(672, 2472, 1700, '1800');
+  vdim(2768, 0, 1300, '1300', -1); vdim(2768, 1300, 2150, '850', -1);
+  vdim(4104, 0, 2080, '2080 opening', -1);
+  const segs = [0,662,2482,3054,3954,L];
+  for (let i=0;i<segs.length-1;i++) hdim(segs[i], segs[i+1], -230, String(segs[i+1]-segs[i]), 0);
+  hdim(0, L, -470, '5035', 0);
+  // overall height on the front-wall end, stud length on the back-wall end
+  vdimRaw(inside ? L+230 : -230, 0, H, '2490');
+  vdimRaw(inside ? -200 : L+200, 35, 2420, '2385 studs');
+  vdimRaw(inside ? -200 : L+200, 2420, 2490, '');
+  // view caption
+  text(X(L/2), SY(-470)+150, inside ? 'seen from inside the room · front wall on the right' : 'seen from the warehouse · front wall on the left', 'lbl2');
+}
+function vdimRaw(xs, y1, y2, label){ // x already in screen coords
+  const g = el('g', {class:'dim'});
+  el('line', {x1:xs, y1:SY(y1), x2:xs, y2:SY(y2)}, g);
+  for (const y of [y1,y2]) el('line', {x1:xs-14, y1:SY(y)+14, x2:xs+14, y2:SY(y)-14}, g);
+  if (label){
+    const side = xs > L/2 ? 1 : -1;
+    const tx = xs + side*(-24) + (side>0 ? 70 : -70), ty = (SY(y1)+SY(y2))/2;
+    text(tx, ty, label, 'dtxt', 'middle', -90);
+  }
+}
+
+function show(i){
+  const m = M[i]; sel = i;
+  const stock = m.len ? `cut ${m.len}${m.qty>1 ? ' × ' + m.qty : ''}` : 'not plank stock';
+  info.innerHTML = '';
+  const b = document.createElement('b'); b.textContent = m.name; info.appendChild(b);
+  const s = document.createElement('span'); s.textContent = m.note; info.appendChild(s);
+  const c = document.createElement('span'); c.className = 'mono'; c.textContent = stock; info.appendChild(c);
+  svg.querySelectorAll('.m.sel').forEach(n => n.classList.remove('sel'));
+  const r = svg.querySelector(`.m[data-i="${i}"]`); if (r) r.classList.add('sel');
+}
+svg.addEventListener('click', e => { const r = e.target.closest('.m'); if (r) show(+r.dataset.i); });
+svg.addEventListener('keydown', e => { if ((e.key==='Enter'||e.key===' ') && e.target.classList.contains('m')){ e.preventDefault(); show(+e.target.dataset.i); } });
+
+const vIn = document.getElementById('vIn'), vOut = document.getElementById('vOut');
+function setView(v){
+  inside = v; vIn.setAttribute('aria-pressed', String(v)); vOut.setAttribute('aria-pressed', String(!v));
+  try { localStorage.setItem('wallb-view', v ? 'in' : 'out'); } catch(e){}
+  draw(); if (sel !== null) show(sel);
+}
+vIn.addEventListener('click', () => setView(true));
+vOut.addEventListener('click', () => setView(false));
+
+/* ---------- legend ---------- */
+const lg = document.getElementById('legend');
+for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','frame']){
+  const s = document.createElement('span');
+  s.innerHTML = `<i style="background:var(${TYPES[k].c})"></i>${TYPES[k].n}`;
+  lg.appendChild(s);
+}
+
+/* ---------- section over the door ---------- */
+{
+  const g = document.getElementById('sect');
+  const top = 2490, S = 1;  // 1 drawing unit = 1 mm; y counted down from the top of the wall
+  const Y = y => (top - y) * S;
+  const r = (x,y,w,h,fill,extra={}) => el('rect', Object.assign({x, y:Y(y+h), width:w, height:h, fill, class:'d-m'}, extra), g);
+  const t = (x,y,s,cls='d-lbl') => { const e = el('text', {x, y, class:cls}, g); e.textContent = s; return e; };
+  r(0,2455,90,35,'var(--plate)'); r(0,2420,90,35,'var(--plate)');
+  r(0,2170,90,250,'var(--crip)');
+  r(0,2080,35,90,'var(--head)'); r(35,2080,20,90,'var(--ply)'); r(55,2080,35,90,'var(--head)');
+  r(0,2075,102,5,'var(--pack)'); r(0,2045,102,30,'var(--jamb)');
+  r(40,2015,12,30,'var(--jamb)');
+  r(0,1960,40,82,'var(--leaf)', {opacity:.55});
+  r(90,2083,12,395,'var(--osb)');
+  const lead = (x1,y1,x2,y2) => el('path', {class:'d-lead', d:`M${x1} ${Y(y1)} L${x2} ${Y(y2)}`}, g);
+  lead(80,2472,190,2472); t(198,Y(2472)+5,'top plates, 2 × 35');
+  lead(70,2300,190,2300); t(198,Y(2300)+5,'short stud');
+  lead(80,2125,190,2155); t(198,Y(2155)+5,'double header, 2 × 90×35 on edge');
+  t(198,Y(2155)+24,'with a 20 ply strip between','d-lbl2');
+  lead(97,2060,190,2060); t(198,Y(2060)+5,'door frame head (30) on packers');
+  lead(20,1990,190,1990); t(198,Y(1990)+5,'door, 40 thick, closes onto the stop','d-lbl2');
+  lead(96,2380,190,2400); t(198,Y(2400)+5,'OSB lining','d-lbl2');
+  t(-50,Y(1950)+30,'outside','d-lbl2'); t(60,Y(1950)+30,'inside','d-lbl2');
+  const dg = el('g', {class:'dim'}, g);
+  el('line', {x1:-30, y1:Y(2080), x2:-30, y2:Y(2490), style:'stroke-width:1.5'}, dg);
+  for (const y of [2080,2170,2420,2490]) el('line', {x1:-36, y1:Y(y)+6, x2:-24, y2:Y(y)-6, style:'stroke-width:1.5'}, dg);
+}
+
+/* ---------- cut list + mark-out ---------- */
+{
+  const rows = new Map();
+  for (const m of M){ if (!m.len) continue;
+    const key = m.t + '|' + m.name + '|' + m.len;
+    const r = rows.get(key) || {t:m.t, name:m.name, len:m.len, n:0};
+    r.n += (m.qty || 1); rows.set(key, r);
+  }
+  const order = ['plate','stud','cal','trim','crip','head','sill','nog'];
+  const list = [...rows.values()].sort((a,b) => order.indexOf(a.t)-order.indexOf(b.t) || b.len-a.len);
+  let total = 0, html = '<thead><tr><th>Piece</th><th class="n">Cut</th><th class="n">Qty</th><th class="n">Metres</th></tr></thead><tbody>';
+  for (const r of list){
+    const m = r.len * r.n / 1000; total += m;
+    html += `<tr><td><span class="sw" style="background:var(${TYPES[r.t].c})"></span>${r.name}</td><td class="n mono">${r.len}</td><td class="n mono">${r.n}</td><td class="n mono">${m.toFixed(2)}</td></tr>`;
+  }
+  html += `</tbody><tfoot><tr><td>Total 90×35</td><td></td><td></td><td class="n mono">${total.toFixed(1)} m</td></tr></tfoot>`;
+  document.getElementById('cut').innerHTML = html;
+
+  const ups = M.filter(m => ['stud','cal','trim','crip'].includes(m.t));
+  const byX = new Map();
+  for (const m of ups){ const k = m.x; if (!byX.has(k)) byX.set(k, new Set()); byX.get(k).add(m.name); }
+  let mh = '<thead><tr><th class="n">From end</th><th>Upright</th></tr></thead><tbody>';
+  for (const [x, names] of [...byX.entries()].sort((a,b)=>a[0]-b[0]))
+    mh += `<tr><td class="n mono">${x}</td><td>${[...names].join(' + ')}</td></tr>`;
+  document.getElementById('mark').innerHTML = mh + '</tbody>';
+}
+
+setView(inside);
+})();
+</script>
+
+</html>
