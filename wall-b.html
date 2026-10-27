@@ -90,6 +90,22 @@
   .tlbl{font:500 36px var(--f-mono); fill:var(--ink); paint-order:stroke; stroke:var(--halo); stroke-width:10; stroke-linejoin:round}
   .tlbl2{font:500 32px var(--f-mono); fill:var(--ink2); paint-order:stroke; stroke:var(--halo); stroke-width:10; stroke-linejoin:round}
   .tdim{font:500 34px var(--f-mono); fill:var(--accent); paint-order:stroke; stroke:var(--halo); stroke-width:10; stroke-linejoin:round}
+  .player{display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; padding:2px 6px 10px; border-bottom:1px solid var(--line); margin-bottom:8px}
+  .pbtn{appearance:none; border:1px solid var(--line); background:var(--card); color:var(--ink); font:600 13px var(--f-display);
+    padding:7px 12px; border-radius:8px; cursor:pointer; min-width:40px}
+  .pbtn.primary{background:var(--accent); border-color:var(--accent); color:var(--card)}
+  .pbtn:disabled{opacity:.4; cursor:default}
+  .pbtn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .pcap{display:flex; flex-wrap:wrap; gap:4px 8px; align-items:baseline; font-size:13px; min-width:0; flex:1 1 280px}
+  .pcap b{font-weight:700}
+  .pcap .mono{color:var(--accent)}
+  [data-step]{transition:opacity .35s ease}
+  .m.now{stroke:var(--accent); stroke-width:12}
+  @media (prefers-reduced-motion: no-preference){
+    [data-step].now{animation:pop .6s ease-out both; transform-box:fill-box; transform-origin:center}
+    @keyframes pop{from{opacity:0; transform:scale(.94)} to{opacity:1; transform:none}}
+  }
+  .brace{stroke:var(--accent); stroke-width:35; opacity:.45; stroke-linecap:round}
   .ghost{fill:none; stroke:var(--ink2); stroke-width:4; stroke-dasharray:22 16; opacity:.7}
   .swing{fill:none; stroke:var(--ink2); stroke-width:4}
   .ground{stroke:var(--ink2); stroke-width:6}
@@ -118,6 +134,13 @@
   </header>
 
   <section class="card sheet" aria-label="Wall B elevation">
+    <div class="player" id="player">
+      <button id="pPlay" class="pbtn primary">Play build order</button>
+      <button id="pPrev" class="pbtn" aria-label="Previous step" disabled>‹</button>
+      <button id="pNext" class="pbtn" aria-label="Next step">›</button>
+      <button id="pReset" class="pbtn" hidden>Show whole wall</button>
+      <div class="pcap" id="pCap" aria-live="polite"><b>Build order</b><span>Press play to see which pieces get screwed together first.</span></div>
+    </div>
     <div class="draw"><svg id="elev" role="img" aria-label="Framing elevation of Wall B with the door and window"></svg></div>
     <div class="legend" id="legend"></div>
     <div class="info" id="info"><b>Tap any piece</b><span>to see what it is and the length to cut.</span></div>
@@ -282,6 +305,52 @@ const X = (x, w=0) => inside ? L - x - w : x;
 const info = document.getElementById('info');
 let sel = null;
 let showTie = true;
+let curStep = 0;   // 0 = whole wall; 1–11 = build order
+const STEPS = [
+  null,
+  ['Outer frame', 'Bottom plank and the lower top plank, screwed to the two end uprights.'],
+  ['Corner strips', 'Screw each end crosspiece to its corner strip first, then fit the strip onto the end upright.'],
+  ['Door and window pairs', 'Screw each beam support to its upright, then fit all four pairs into the frame.'],
+  ['Single upright', 'The one between the door and the right end.'],
+  ['Both beams', 'Sit each beam on its supports and screw through the uprights into its ends.'],
+  ['Under the window', 'Four short uprights, then the plank across their tops.'],
+  ['Middle crosspieces', 'The two in the middle gaps, screwed through the uprights.'],
+  ['Short pieces above the beams', 'Cut to fit, then screw down through the top plank into them.'],
+  ['Second top plank', 'Full length, on top of the first.'],
+  ['Ready to lift', 'Two diagonal braces running opposite ways, plus the tie across the door gap.'],
+  ['Once it is standing', 'Take the braces and the tie off, then fit the door frame, the door and the window.'],
+];
+function stepOf(m){
+  switch (m.t){
+    case 'plate': return m.y === H-35 ? 9 : 1;
+    case 'stud':  return (m.x === 0 || m.x === L-35) ? 1 : (m.x === 4375 ? 4 : 3);
+    case 'cal':   return 2;
+    case 'trim':  return 3;
+    case 'head':  return 5;
+    case 'sill':  return 6;
+    case 'crip':  return m.y === 35 ? 6 : 8;
+    case 'nog':   return (m.x === 125 || m.x === 4410) ? 2 : 7;
+    default:      return 11;   // door frame, spacers, window frame
+  }
+}
+function tagFrom(i, step, until){
+  for (; i < svg.childNodes.length; i++){
+    const n = svg.childNodes[i];
+    n.setAttribute('data-step', step);
+    if (until) n.setAttribute('data-until', until);
+  }
+}
+function applyStep(k){
+  svg.querySelectorAll('[data-step]').forEach(n => {
+    const st = n.dataset.step;
+    if (st === 'ins'){ n.style.opacity = k ? 0 : ''; return; }
+    const sn = +st, until = n.dataset.until ? +n.dataset.until : Infinity;
+    const vis = !k || (sn <= k && k <= until);
+    n.style.opacity = vis ? '' : 0;
+    n.style.pointerEvents = vis ? '' : 'none';
+    n.classList.toggle('now', !!k && sn === k);
+  });
+}
 
 function text(x, y, s, cls, anchor='middle', rot){
   const t = el('text', {x, y, class:cls, 'text-anchor':anchor});
@@ -309,17 +378,20 @@ function draw(){
   svg.textContent = '';
   // floor line
   el('line', {class:'ground', x1:-300, y1:SY(0), x2:L+300, y2:SY(0)});
+  const _ins = svg.childNodes.length;
   // insulation bays behind the frame
   for (const [x,w,y0,y1,ly] of BAYS){
     el('rect', {x:X(x,w), y:SY(y1), width:w, height:y1-y0, fill:'var(--insul)', 'pointer-events':'none'});
     if (ly) text(X(x+w/2), SY(ly), String(w), w===405 ? 'bayok' : 'bayodd');
   }
+  tagFrom(_ins, 'ins');
   // members
   M.forEach((m, i) => {
     const r = el('rect', {x:X(m.x, m.w), y:SY(m.y+m.h), width:m.w, height:m.h,
-      fill:`var(${TYPES[m.t].c})`, class:'m' + (sel===i ? ' sel' : ''), tabindex: m.len ? 0 : -1});
+      fill:`var(${TYPES[m.t].c})`, class:'m' + (sel===i ? ' sel' : ''), tabindex: m.len ? 0 : -1, 'data-step': stepOf(m)});
     r.dataset.i = i;
   });
+  const _fit = svg.childNodes.length;
   // glass + door leaf
   el('rect', {x:X(680,1660), y:SY(2075), width:1660, height:705, fill:'var(--glass)', opacity:.45, 'pointer-events':'none'});
   const DX = 3005, DW = 855, DH = 2060;
@@ -333,11 +405,18 @@ function draw(){
   for (const y of [200,1030,1860]) el('rect', {x:X(DX+DW-4,8), y:SY(y+50), width:8, height:100, fill:'var(--ink)', 'pointer-events':'none'});
   text(X(DX+DW/2), SY(1100), 'door 855 × 2060', 'lbl2');
   text(X(DX+DW/2), SY(1040), inside ? 'opens towards you' : 'opens away from you', 'lbl2');
+  tagFrom(_fit, 11);
+  const _lift = svg.childNodes.length;
   // temporary plank holding the door gap for the lift
-  if (showTie){
+  if (showTie || curStep){
     el('rect', {x:X(2657,1550), y:SY(90), width:1550, height:90, fill:'var(--tie)', stroke:'var(--accent)', 'stroke-width':5, 'stroke-dasharray':'20 12', 'pointer-events':'none'});
     for (const [x,y] of [[2690,12],[2790,24],[2890,12],[3975,12],[4075,24],[4175,12]]) el('circle', {cx:X(x), cy:SY(y), r:10, fill:'var(--ink)', 'pointer-events':'none'});
     text(X(3432), SY(90)-26, 'temporary plank for the lift', 'lbl2');
+  }
+  if (curStep){
+    el('line', {class:'brace', x1:X(60), y1:SY(60), x2:X(L-60), y2:SY(H-60)});
+    el('line', {class:'brace', x1:X(60), y1:SY(H-60), x2:X(L-60), y2:SY(60)});
+    tagFrom(_lift, 10, 10);
   }
   // where the end walls butt in
   for (const x0 of [0, L-90]) el('rect', {class:'ghost', x:X(x0,90), y:SY(H), width:90, height:H, 'pointer-events':'none'});
@@ -361,6 +440,7 @@ function draw(){
   vdimRaw(inside ? -200 : L+200, 35, H-70, STUD + ' uprights');
   vdimRaw(inside ? -200 : L+200, H-70, H, '');
   text(X(L/2), SY(-470)+150, inside ? 'seen from inside the room · door on the left' : 'standing outside the studio · door on the right', 'lbl2');
+  applyStep(curStep);
 }
 function vdimRaw(xs, y1, y2, label){ // x already in screen coords
   const g = el('g', {class:'dim'});
@@ -394,6 +474,43 @@ function setView(v){
 }
 vIn.addEventListener('click', () => setView(true));
 vOut.addEventListener('click', () => setView(false));
+const pPlay = document.getElementById('pPlay'), pPrev = document.getElementById('pPrev'),
+      pNext = document.getElementById('pNext'), pReset = document.getElementById('pReset'), pCap = document.getElementById('pCap');
+let timer = null;
+function caption(){
+  pCap.textContent = '';
+  if (!curStep){
+    const b = document.createElement('b'); b.textContent = 'Build order'; pCap.appendChild(b);
+    const sp = document.createElement('span'); sp.textContent = 'Press play to see which pieces get screwed together first.'; pCap.appendChild(sp);
+    return;
+  }
+  const n = document.createElement('span'); n.className = 'mono'; n.textContent = `Step ${curStep} of ${STEPS.length-1}`; pCap.appendChild(n);
+  const b = document.createElement('b'); b.textContent = STEPS[curStep][0]; pCap.appendChild(b);
+  const sp = document.createElement('span'); sp.textContent = STEPS[curStep][1]; pCap.appendChild(sp);
+}
+function goStep(k){
+  const was = curStep;
+  curStep = Math.max(0, Math.min(STEPS.length-1, k));
+  if (!!was !== !!curStep) draw(); else applyStep(curStep);
+  pPrev.disabled = curStep <= 1;
+  pNext.disabled = curStep >= STEPS.length-1;
+  pReset.hidden = !curStep;
+  caption();
+}
+function stopPlay(){ if (timer){ clearInterval(timer); timer = null; } pPlay.textContent = curStep >= STEPS.length-1 ? 'Play again' : (curStep ? 'Play' : 'Play build order'); }
+pPlay.addEventListener('click', () => {
+  if (timer){ stopPlay(); return; }
+  if (!curStep || curStep >= STEPS.length-1) goStep(1);
+  pPlay.textContent = 'Pause';
+  timer = setInterval(() => {
+    if (curStep >= STEPS.length-1){ stopPlay(); return; }
+    goStep(curStep + 1);
+    if (curStep >= STEPS.length-1) stopPlay();
+  }, 2600);
+});
+pPrev.addEventListener('click', () => { stopPlay(); goStep(curStep - 1 || 1); stopPlay(); });
+pNext.addEventListener('click', () => { stopPlay(); goStep(curStep + 1); stopPlay(); });
+pReset.addEventListener('click', () => { stopPlay(); goStep(0); stopPlay(); });
 const tieBtn = document.getElementById('tieBtn');
 tieBtn.addEventListener('click', () => { showTie = !showTie; tieBtn.setAttribute('aria-pressed', String(showTie)); draw(); if (sel !== null) show(sel); });
 
