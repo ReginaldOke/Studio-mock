@@ -128,10 +128,10 @@
     <div class="tiegrid">
       <svg id="tie" role="img" aria-label="Close-up of the bottom of the door gap with a temporary plank screwed across it"></svg>
       <ol class="steps">
-        <li>Measure the door gap at the bottom. Push or pull the sides until it's <span class="mono">935</span>, the same as at the top.</li>
-        <li>Lay a spare plank about <span class="mono">1200</span> long flat across the face that's facing up, <span class="mono">100</span> up from the bottom edge and centred on the door gap.</li>
-        <li>Put two screws into each of the four pieces it crosses: the upright and the beam support on each side of the door.</li>
-        <li>Measure the gap again. If it's still 935, you're ready to lift.</li>
+        <li>Lay the two bottom plank pieces in a straight line with the door gap between them at <span class="mono">935</span>. A string or a straight plank along their bottom edge keeps them lined up.</li>
+        <li>Lay a spare plank at least <span class="mono">1550</span> long flat on top of the bottom plank, bridging the gap with at least <span class="mono">300</span> onto each piece. Line its bottom edge up with the bottom of the wall.</li>
+        <li>Screw it down with three 65–75 mm screws each side, staggered so the plank doesn't split.</li>
+        <li>Check the gap is still 935, then fit the uprights and beam supports onto the bottom plank as normal.</li>
         <li>Once the wall is standing, screw the bottom plank down on both sides of the door and fix the wall's ends to the end walls. Then unscrew the plank.</li>
       </ol>
     </div>
@@ -335,9 +335,9 @@ function draw(){
   text(X(DX+DW/2), SY(1040), inside ? 'opens towards you' : 'opens away from you', 'lbl2');
   // temporary plank holding the door gap for the lift
   if (showTie){
-    el('rect', {x:X(2832,1200), y:SY(190), width:1200, height:90, fill:'var(--tie)', stroke:'var(--accent)', 'stroke-width':5, 'stroke-dasharray':'20 12', 'pointer-events':'none'});
-    for (const x of [2912.5,2947.5,3917.5,3952.5]) for (const y of [125,165]) el('circle', {cx:X(x), cy:SY(y), r:10, fill:'var(--ink)', 'pointer-events':'none'});
-    text(X(3432), SY(190)-26, 'temporary plank for the lift', 'lbl2');
+    el('rect', {x:X(2657,1550), y:SY(90), width:1550, height:90, fill:'var(--tie)', stroke:'var(--accent)', 'stroke-width':5, 'stroke-dasharray':'20 12', 'pointer-events':'none'});
+    for (const [x,y] of [[2690,12],[2790,24],[2890,12],[3975,12],[4075,24],[4175,12]]) el('circle', {cx:X(x), cy:SY(y), r:10, fill:'var(--ink)', 'pointer-events':'none'});
+    text(X(3432), SY(90)-26, 'temporary plank for the lift', 'lbl2');
   }
   // where the end walls butt in
   for (const x0 of [0, L-90]) el('rect', {class:'ghost', x:X(x0,90), y:SY(H), width:90, height:H, 'pointer-events':'none'});
@@ -441,20 +441,18 @@ for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','
   e2('line', {class:'ground', x1:2650, y1:SY(0), x2:4250, y2:SY(0)});
   for (const m of M){ if (['jamb','pack','frame'].includes(m.t)) continue;
     e2('rect', {x:m.x, y:SY(m.y+m.h), width:m.w, height:m.h, fill:`var(${TYPES[m.t].c})`, class:'d-m', style:'stroke-width:2'}); }
-  e2('rect', {x:2832, y:SY(190), width:1200, height:90, fill:'var(--tie)', stroke:'var(--accent)', 'stroke-width':4, 'stroke-dasharray':'16 10'});
-  for (const x of [2912.5,2947.5,3917.5,3952.5]) for (const y of [125,165]) e2('circle', {cx:x, cy:SY(y), r:9, fill:'var(--ink)'});
+  e2('rect', {x:2657, y:SY(90), width:1550, height:90, fill:'var(--tie)', stroke:'var(--accent)', 'stroke-width':4, 'stroke-dasharray':'16 10'});
+  for (const [x,y] of [[2690,12],[2790,24],[2890,12],[3975,12],[4075,24],[4175,12]]) e2('circle', {cx:x, cy:SY(y), r:9, fill:'var(--ink)'});
   const tx = (x,y,str,cls='tlbl',anchor='middle') => { const n = e2('text', {x, y, class:cls, 'text-anchor':anchor}); n.textContent = str; };
   const dimH = (x1,x2,y,lab) => { const g = el('g', {class:'dim'}, t);
     el('line', {x1, y1:SY(y), x2, y2:SY(y), style:'stroke-width:3'}, g);
     for (const q of [x1,x2]) el('line', {x1:q-10, y1:SY(y)+10, x2:q+10, y2:SY(y)-10, style:'stroke-width:3'}, g);
     tx((x1+x2)/2, SY(y)-16, lab, 'tdim'); };
   dimH(2965, 3900, -90, '935 at the bottom, same as the top');
-  dimH(2832, 4032, 280, 'spare plank, about 1200');
-  const g = el('g', {class:'dim'}, t);
-  el('line', {x1:2760, y1:SY(0), x2:2760, y2:SY(100), style:'stroke-width:3'}, g);
-  for (const y of [0,100]) el('line', {x1:2750, y1:SY(y)+10, x2:2770, y2:SY(y)-10, style:'stroke-width:3'}, g);
-  tx(2740, SY(50)+12, '100', 'tdim', 'end');
-  tx(3432, SY(470), 'two screws into each upright and beam support', 'tlbl');
+  dimH(2657, 4207, 200, 'spare plank, at least 1550');
+  dimH(2657, 2965, 140, '300+');
+  dimH(3900, 4207, 140, '300+');
+  tx(3432, SY(470), 'three screws each side, into the bottom plank', 'tlbl');
   tx(3432, SY(410), 'unscrew it once the wall is fixed in place', 'tlbl2');
   tx(2700, SY(560), 'as you are building it, outside face up', 'tlbl2', 'start');
 }
