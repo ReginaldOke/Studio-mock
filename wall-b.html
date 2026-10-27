@@ -310,8 +310,8 @@ const STEPS = [
   null,
   ['Outer frame', 'Bottom plank and the lower top plank, screwed to the two end uprights.'],
   ['Corner strips', 'Screw each end crosspiece to its corner strip first, then fit the strip onto the end upright.'],
-  ['Tall uprights and middle crosspieces', 'Fit the four tall uprights either side of the door and window. While each one has nothing beside it, nail through it into the crosspieces that meet it.'],
-  ['Single upright', 'The one between the door and the right end. Nail through it into the crosspieces either side.'],
+  ['All the tall uprights', 'The four either side of the door and window, plus the single one between the door and the right end. Nail through them into the end crosspieces where they meet.'],
+  ['Middle crosspieces', 'The two in the middle gaps. Nail through the uprights into both ends, before anything goes beside those uprights.'],
   ['Beam supports', 'Now screw a beam support onto each tall upright, on the side facing the door or window.'],
   ['Both beams', 'Screw each pair of flat planks together first, every 150 or so, alternating sides. Then sit each beam on its supports and screw through the uprights into its ends.'],
   ['Under the window', 'Four short uprights, then the plank across their tops.'],
@@ -323,13 +323,13 @@ const STEPS = [
 function stepOf(m){
   switch (m.t){
     case 'plate': return m.y === H-35 ? 9 : 1;
-    case 'stud':  return (m.x === 0 || m.x === L-35) ? 1 : (m.x === 4375 ? 4 : 3);
+    case 'stud':  return (m.x === 0 || m.x === L-35) ? 1 : 3;
     case 'cal':   return 2;
     case 'trim':  return 5;
     case 'head':  return 6;
     case 'sill':  return 7;
     case 'crip':  return m.y === 35 ? 7 : 8;
-    case 'nog':   return (m.x === 125 || m.x === 4410) ? 2 : 3;
+    case 'nog':   return (m.x === 125 || m.x === 4410) ? 2 : 4;
     default:      return 11;   // door frame, spacers, window frame
   }
 }
