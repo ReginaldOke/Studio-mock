@@ -14,7 +14,7 @@
     --cavity:#e3e6e0; --hi:#ffffff;
     --plate:#7f96ad; --stud:#86ab8c; --trim:#5d9468; --crip:#b4cfb8; --cal:#3d8a84; --nog:#d9a05e;
     --head:#a8653a; --sill:#9db0c2; --jamb:#9c7c58; --pack:#d6b258; --leaf:#7a5c40;
-    --frame:#b98a6a; --glass:#8fb4c4; --osb:#c9a25e; --ply:#cdb48a;
+    --frame:#b98a6a; --glass:#8fb4c4; --osb:#c9a25e; --ply:#cdb48a; --insul:#ecdfb3;
     --f-display:'Archivo', system-ui, -apple-system, sans-serif;
     --f-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   }
@@ -22,13 +22,13 @@
     :root:not([data-theme="light"]){
       --bg:#15181c; --card:#1c2025; --ink:#e9e7e2; --ink2:#9aa0a6; --line:rgba(233,231,226,.14);
       --accent:#ff8a68; --accent-soft:rgba(255,138,104,.14); --halo:#1c2025; --edge:rgba(6,8,10,.7);
-      --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; color-scheme:dark;
+      --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; --insul:#4a4433; color-scheme:dark;
     }
   }
   :root[data-theme="dark"]{
     --bg:#15181c; --card:#1c2025; --ink:#e9e7e2; --ink2:#9aa0a6; --line:rgba(233,231,226,.14);
     --accent:#ff8a68; --accent-soft:rgba(255,138,104,.14); --halo:#1c2025; --edge:rgba(6,8,10,.7);
-    --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; color-scheme:dark;
+    --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; --insul:#4a4433; color-scheme:dark;
   }
   *{box-sizing:border-box}
   body{
@@ -80,6 +80,8 @@
   .dtxt{font:500 62px var(--f-mono); fill:var(--accent); paint-order:stroke; stroke:var(--halo); stroke-width:16; stroke-linejoin:round}
   .lbl{font:500 56px var(--f-mono); fill:var(--ink); paint-order:stroke; stroke:var(--halo); stroke-width:14; stroke-linejoin:round}
   .lbl2{font:500 48px var(--f-mono); fill:var(--ink2); paint-order:stroke; stroke:var(--halo); stroke-width:12; stroke-linejoin:round}
+  .bayok{font:600 50px var(--f-mono); fill:var(--ink2)}
+  .bayodd{font:700 50px var(--f-mono); fill:var(--accent)}
   .ghost{fill:none; stroke:var(--ink2); stroke-width:4; stroke-dasharray:22 16; opacity:.7}
   .swing{fill:none; stroke:var(--ink2); stroke-width:4}
   .ground{stroke:var(--ink2); stroke-width:6}
@@ -94,7 +96,7 @@
   <header class="top">
     <div>
       <h1>Wall B framing</h1>
-      <p class="sub">The door wall · 4980 long × 2435 high · 90×35 planks · all sizes in mm</p>
+      <p class="sub">Front wall, with the door · 4980 long × 2435 high · studs at 440 centres for 405 insulation · all sizes in mm</p>
     </div>
     <div>
       <span class="seglabel">Looking from</span>
@@ -126,13 +128,13 @@
         <text class="d-lbl2" x="170" y="300">room</text>
         <path class="d-lead" d="M18 30 L330 20"/><text class="d-lbl" x="338" y="25">Wall B end stud</text>
         <path class="d-lead" d="M80 70 L330 80"/><text class="d-lbl" x="338" y="85">flat stud on the inside face</text>
-        <path class="d-lead" d="M110 96 L330 145"/><text class="d-lbl" x="338" y="150">OSB edge nails in here (36)</text>
-        <path class="d-lead" d="M45 112 L330 215"/><text class="d-lbl" x="338" y="220">front wall end stud,</text>
+        <path class="d-lead" d="M110 96 L330 145"/><text class="d-lbl" x="338" y="150">OSB edge nails in here (35)</text>
+        <path class="d-lead" d="M45 112 L330 215"/><text class="d-lbl" x="338" y="220">end wall's end stud,</text>
         <text class="d-lbl2" x="338" y="240">screwed through into the flat stud</text>
-        <path class="d-lead" d="M45 330 L330 330"/><text class="d-lbl" x="338" y="335">front wall (90 deep)</text>
+        <path class="d-lead" d="M45 330 L330 330"/><text class="d-lbl" x="338" y="335">end wall (90 deep)</text>
         <text class="d-lbl2" x="-30" y="430" transform="rotate(-90 -30 430)">90</text>
       </svg>
-      <p class="cap">The front and back walls butt against Wall B's inside face, so Wall B's lining would have nothing to nail into at the corner. A second stud laid flat beside the end stud gives it a 36 wide nailing strip and something solid to screw the end wall into. The same detail is mirrored at the back-wall end.</p>
+      <p class="cap">The end walls butt against this wall's inside face, so its lining would have nothing to nail into at the corner. A second stud laid flat beside the end stud gives it a 35 wide nailing strip and something solid to screw the end wall into. The same detail is mirrored at the other end.</p>
     </section>
 
     <section class="card detail">
@@ -160,8 +162,9 @@
     <ul class="changes" style="margin-top:12px">
       <li>I've read <span class="mono">5030</span> as the overall room length (floor and roof), which leaves the 4980 wall 25 short at each end. If 5030 means something else, tell me and I'll redraw.</li>
       <li>The studio is 55 lower overall, so it now clears the sloping warehouse ceiling at the far corner by about 100 instead of about 44.</li>
-      <li>The door opening is 935 × 2110: a 30 frame each side, 7 packers, 3 gaps around the door and 12 under it for a drop seal. The door hinges on the back-wall side and opens out; 1081 of wall beyond it lets it fold flat.</li>
-      <li>The window is centred between the front wall and the door with the bottom of its frame 1300 off the floor. At 137 deep it stands 35 into the room past the OSB.</li>
+      <li>The door opening is 935 × 2110: a 30 frame each side, 7 packers, 3 gaps around the door and 12 under it for a drop seal. The door hinges on the right (seen from outside) and opens out; 1080 of wall beyond it lets it fold flat.</li>
+      <li>The window sits between the left end and the door, within 35 of centred so the bays stay 405, with the bottom of its frame 1300 off the floor. At 137 deep it stands 35 into the room past the OSB.</li>
+      <li>Studs are at 440 centres so most gaps are exactly 405 and the crosspieces are cut 405, close to the back wall's spacing (12 uprights at about 450 centres). Like the back wall there's one staggered row of crosspieces; its underside is 1160 above the bottom plate, so a standard 1160 batt fits below it without cutting. Four full-height bays and four under the window take whole-width batts. The odd ones are flagged in red on the drawing: a 445 bay at the right end (a batt plus a 40 strip), a 60 slot under the window, and the short strips above the openings.</li>
       <li>Only this wall is updated. The 3D room model and the other walls still use the old sizes.</li>
     </ul>
   </section>
@@ -175,7 +178,7 @@
     <section class="card">
       <h2>Mark-out on the plates</h2>
       <div class="tbl"><table id="mark"></table></div>
-      <p class="cap">Measured from the front-wall end to the near edge of each upright. Clamp the two plates together and mark them both at once.</p>
+      <p class="cap">Measured from the left end (as seen from outside) to the near edge of each upright. Clamp the two plates together and mark them both at once.</p>
     </section>
   </div>
 </div>
@@ -187,52 +190,61 @@ const L = 4980, H = 2435, NS = 'http://www.w3.org/2000/svg';
 const TYPES = {
   plate:{c:'--plate', n:'Plates'}, stud:{c:'--stud', n:'Full-height studs'}, cal:{c:'--cal', n:'California corner (flat stud)'},
   trim:{c:'--trim', n:'Side posts (trimmers)'}, crip:{c:'--crip', n:'Short studs'}, head:{c:'--head', n:'Double headers'},
-  sill:{c:'--sill', n:'Window sill'}, nog:{c:'--nog', n:'Crosspieces'},
+  sill:{c:'--sill', n:'Window sill'}, nog:{c:'--nog', n:'Crosspieces'}, ins:{c:'--insul', n:'Insulation bays'},
   jamb:{c:'--jamb', n:'Door frame'}, pack:{c:'--pack', n:'Packers'}, frame:{c:'--frame', n:'Window frame'},
 };
-const M = [];   // x from the front-wall end, y up from the floor
+const M = [];   // x from the left end as seen from outside, y up from the floor
 const add = (x,y,w,h,t,name,note,len,qty) => M.push({x,y,w,h,t,name,note,len,qty});
 const STUD = H - 35 - 70;   // 2330: one bottom plate, two top plates
+const T = 35;               // plank face
 // plates
-add(0,0,2964,35,'plate','Bottom plate','stops at the door opening',2964);
-add(3899,0,L-3899,35,'plate','Bottom plate','from the door to the back-wall end',L-3899);
+add(0,0,2965,35,'plate','Bottom plate','stops at the door opening',2965);
+add(3900,0,L-3900,35,'plate','Bottom plate','from the door to the right end',L-3900);
 add(0,H-70,L,35,'plate','Top plate','lower of the double top plate',L);
 add(0,H-35,L,35,'plate','Top plate','upper of the double top plate',L);
-// full studs
-for (const [x,nm] of [[0,'End stud'],[545,'Window king stud'],[2473,'Window king stud'],[2892,'Door king stud'],
-  [3935,'Door king stud'],[4182,'Stud'],[4782,'Stud'],[L-36,'End stud']])
-  add(x,35,36,STUD,'stud',nm,'full height between plates',STUD);
+// full studs, spaced for 405 insulation
+for (const [x,nm] of [[0,'End stud'],[530,'Window king stud'],[2455,'Window king stud'],[2895,'Door king stud'],
+  [3935,'Door king stud'],[4375,'Stud'],[L-35,'End stud']])
+  add(x,35,T,STUD,'stud',nm,'full height between plates',STUD);
 // California corners
-add(36,35,90,STUD,'cal','California corner','stud turned flat on the inside face, beside the end stud',STUD);
-add(L-126,35,90,STUD,'cal','California corner','stud turned flat on the inside face, beside the end stud',STUD);
-// window: opening 617–2437 × 1290–2155, frame 1800 × 845 with its bottom at 1300
-add(581,35,36,2120,'trim','Window side post','carries the window header',2120);
-add(2437,35,36,2120,'trim','Window side post','carries the window header',2120);
-add(581,2155,1892,90,'head','Window header','two 90×35 on edge + 20 ply packer',1892,2);
-add(617,1255,1820,35,'sill','Window sill','flat plank under the window',1820);
-for (const x of [1182,1773,2382]){
-  add(x,35,36,1220,'crip','Short stud','under the window sill',1220);
-  add(x,2245,36,H-70-2245,'crip','Short stud','between the window header and the top plates',H-70-2245);
+add(35,35,90,STUD,'cal','California corner','stud turned flat on the inside face, beside the end stud',STUD);
+add(L-125,35,90,STUD,'cal','California corner','stud turned flat on the inside face, beside the end stud',STUD);
+// window: opening 600–2420 × 1290–2155, frame 1800 × 845 with its bottom at 1300
+add(565,35,T,2120,'trim','Window side post','carries the window header',2120);
+add(2420,35,T,2120,'trim','Window side post','carries the window header',2120);
+add(565,2155,1890,90,'head','Window header','two 90×35 on edge + 20 ply packer',1890,2);
+add(600,1255,1820,35,'sill','Window sill','flat plank under the window',1820);
+for (const x of [1005,1445,1885,2325]){
+  add(x,35,T,1220,'crip','Short stud','under the window sill, 405 apart',1220);
+  add(x,2245,T,H-70-2245,'crip','Short stud','between the window header and the top plates',H-70-2245);
 }
-// door: opening 2964–3899 × 0–2110
-add(2928,35,36,2075,'trim','Door side post','carries the door header',2075);
-add(3899,35,36,2075,'trim','Door side post','carries the door header',2075);
-add(2928,2110,1007,90,'head','Door header','two 90×35 on edge + 20 ply packer',1007,2);
-add(3582,2200,36,H-70-2200,'crip','Short stud','between the door header and the top plates',H-70-2200);
-// crosspieces, staggered between bays so each can be nailed through the studs
-const A = [400,1200,2000], B = [800,1600];
-for (const [x,w,rows] of [[126,419,A],[617,565,[800]],[1218,555,[400,1200]],[1809,573,[800]],
-  [2509,383,A],[3971,211,B],[4218,564,A]])
-  for (const y of rows) add(x,y,w,36,'nog','Crosspiece','cut to fit between the uprights',w);
+// door: opening 2965–3900 × 0–2110
+add(2930,35,T,2075,'trim','Door side post','carries the door header',2075);
+add(3900,35,T,2075,'trim','Door side post','carries the door header',2075);
+add(2930,2110,1005,90,'head','Door header','two 90×35 on edge + 20 ply packer',1005,2);
+for (const x of [3335,3775]) add(x,2200,T,H-70-2200,'crip','Short stud','between the door header and the top plates',H-70-2200);
+// crosspieces: 405 long, staggered between bays so each can be nailed through the studs
+// one row like the back wall, staggered by a plank so both ends can be nailed;
+// its underside at 1195 leaves exactly 1160 (one standard batt) above the bottom plate
+const A = [1195], B = [1230];
+for (const [x,w,rows] of [[125,405,A],[2490,405,B],[3970,405,A],[4410,445,B]])
+  for (const y of rows) add(x,y,w,35,'nog','Crosspiece', w===405 ? 'cut 405, same as the insulation' : 'cut to fit this wider bay',w);
 // door frame and packers (not plank stock)
-add(2971,0,30,2105,'jamb','Door frame leg','30 thick, packed off the posts',0);
-add(3862,0,30,2105,'jamb','Door frame leg','hinge side, 3 hinges',0);
-add(2971,2075,921,30,'jamb','Door frame head','',0);
-for (const y of [300,1000,1800]){ add(2964,y,7,80,'pack','Packer','plastic packer behind the frame',0); add(3892,y,7,80,'pack','Packer','plastic packer behind the frame',0); }
+add(2972,0,30,2105,'jamb','Door frame leg','30 thick, packed off the posts',0);
+add(3863,0,30,2105,'jamb','Door frame leg','hinge side, 3 hinges',0);
+add(2972,2075,921,30,'jamb','Door frame head','',0);
+for (const y of [300,1000,1800]){ add(2965,y,7,80,'pack','Packer','plastic packer behind the frame',0); add(3893,y,7,80,'pack','Packer','plastic packer behind the frame',0); }
 add(3100,2105,80,5,'pack','Packer','',0); add(3700,2105,80,5,'pack','Packer','',0);
 // window frame
-for (const [x,y,w,h] of [[627,1300,1800,70],[627,2075,1800,70],[627,1370,70,705],[2357,1370,70,705]])
+for (const [x,y,w,h] of [[610,1300,1800,70],[610,2075,1800,70],[610,1370,70,705],[2340,1370,70,705]])
   add(x,y,w,h,'frame','Window frame','reclaimed 1800 × 845 × 137, fixed glass',0);
+// insulation bays (405 batts); odd widths are flagged on the drawing
+const BAYS = [
+  [125,405,35,H-70,2200],[2490,405,35,H-70,2200],[3970,405,35,H-70,2200],[4410,445,35,H-70,2200],
+  [600,405,35,1255,1000],[1040,405,35,1255,1000],[1480,405,35,1255,1000],[1920,405,35,1255,1000],[2360,60,35,1255,1000],
+  [565,440,2245,H-70],[1040,405,2245,H-70],[1480,405,2245,H-70],[1920,405,2245,H-70],[2360,95,2245,H-70],
+  [2930,405,2200,H-70],[3370,405,2200,H-70],[3810,125,2200,H-70],
+];
 
 /* ---------- elevation ---------- */
 const svg = document.getElementById('elev');
@@ -273,6 +285,11 @@ function draw(){
   svg.textContent = '';
   // floor line
   el('line', {class:'ground', x1:-300, y1:SY(0), x2:L+300, y2:SY(0)});
+  // insulation bays behind the frame
+  for (const [x,w,y0,y1,ly] of BAYS){
+    el('rect', {x:X(x,w), y:SY(y1), width:w, height:y1-y0, fill:'var(--insul)', 'pointer-events':'none'});
+    if (ly) text(X(x+w/2), SY(ly), String(w), w===405 ? 'bayok' : 'bayodd');
+  }
   // members
   M.forEach((m, i) => {
     const r = el('rect', {x:X(m.x, m.w), y:SY(m.y+m.h), width:m.w, height:m.h,
@@ -280,8 +297,8 @@ function draw(){
     r.dataset.i = i;
   });
   // glass + door leaf
-  el('rect', {x:X(697,1660), y:SY(2075), width:1660, height:705, fill:'var(--glass)', opacity:.45, 'pointer-events':'none'});
-  const DX = 3004, DW = 855, DH = 2060;
+  el('rect', {x:X(680,1660), y:SY(2075), width:1660, height:705, fill:'var(--glass)', opacity:.45, 'pointer-events':'none'});
+  const DX = 3005, DW = 855, DH = 2060;
   el('rect', {x:X(DX,DW), y:SY(12+DH), width:DW, height:DH, fill:'var(--leaf)', opacity:.22, stroke:'var(--leaf)', 'stroke-width':5, 'pointer-events':'none'});
   for (const [px,py,pw,ph] of [[120,200,252,800],[482,200,252,800],[120,1150,252,780],[482,1150,252,780]])
     el('rect', {x:X(DX+px, pw), y:SY(12+py+ph), width:pw, height:ph, fill:'none', stroke:'var(--leaf)', 'stroke-width':4, opacity:.6, 'pointer-events':'none'});
@@ -292,22 +309,22 @@ function draw(){
   for (const y of [200,1030,1860]) el('rect', {x:X(DX+DW-4,8), y:SY(y+50), width:8, height:100, fill:'var(--ink)', 'pointer-events':'none'});
   text(X(DX+DW/2), SY(1100), 'door 855 × 2060', 'lbl2');
   text(X(DX+DW/2), SY(1040), inside ? 'opens away from you' : 'opens towards you', 'lbl2');
-  // ends where the front and back walls butt in
+  // where the end walls butt in
   for (const x0 of [0, L-90]) el('rect', {class:'ghost', x:X(x0,90), y:SY(H), width:90, height:H, 'pointer-events':'none'});
   // labels above the wall
   text(X(L/2), SY(H)-70, 'double top plate · 2 × 35', 'lbl');
-  text(X(45), SY(H)-70, 'front wall', 'lbl2', inside ? 'end' : 'start');
-  text(X(L-45), SY(H)-70, 'back wall', 'lbl2', inside ? 'start' : 'end');
+  text(X(45), SY(H)-70, 'end wall', 'lbl2', inside ? 'end' : 'start');
+  text(X(L-45), SY(H)-70, 'end wall', 'lbl2', inside ? 'start' : 'end');
   text(X(81), SY(H)-150, 'California corner', 'lbl', inside ? 'end' : 'start');
   text(X(L-81), SY(H)-150, 'California corner', 'lbl', inside ? 'start' : 'end');
-  text(X(1527), SY(2200)+20, '2 × 90×35 on edge', 'lbl2');
-  text(X(3431), SY(2155)+20, '2 × 90×35', 'lbl2');
-  text(X(1527), SY(1722)-60, 'window 1800 × 845', 'lbl2');
+  text(X(1510), SY(2200)+20, '2 × 90×35 on edge', 'lbl2');
+  text(X(3432), SY(2155)+20, '2 × 90×35', 'lbl2');
+  text(X(1510), SY(1722)-60, 'window 1800 × 845', 'lbl2');
   // dimensions
-  hdim(627, 2427, 1700, '1800');
-  vdim(2700, 0, 1300, '1300', -1); vdim(2700, 1300, 2145, '845', -1);
-  vdim(4076, 0, 2110, '2110 opening', -1);
-  const segs = [0,617,2437,2964,3899,L];
+  hdim(610, 2410, 1700, '1800');
+  vdim(2692, 0, 1300, '1300', -1); vdim(2692, 1300, 2145, '845', -1);
+  vdim(4172, 0, 2110, '2110 opening', -1);
+  const segs = [0,600,2420,2965,3900,L];
   for (let i=0;i<segs.length-1;i++) hdim(segs[i], segs[i+1], -230, String(segs[i+1]-segs[i]), 0);
   hdim(0, L, -470, String(L), 0);
   vdimRaw(inside ? L+230 : -230, 0, H, String(H));
@@ -350,7 +367,7 @@ vOut.addEventListener('click', () => setView(false));
 
 /* ---------- legend ---------- */
 const lg = document.getElementById('legend');
-for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','frame']){
+for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','frame','ins']){
   const s = document.createElement('span');
   s.innerHTML = `<i style="background:var(${TYPES[k].c})"></i>${TYPES[k].n}`;
   lg.appendChild(s);
