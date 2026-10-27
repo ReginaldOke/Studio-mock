@@ -310,11 +310,11 @@ const STEPS = [
   null,
   ['Outer frame', 'Bottom plank and the lower top plank, screwed to the two end uprights.'],
   ['Corner strips', 'Screw each end crosspiece to its corner strip first, then fit the strip onto the end upright.'],
-  ['Door and window pairs', 'Screw each beam support to its upright, then fit all four pairs into the frame.'],
-  ['Single upright', 'The one between the door and the right end.'],
+  ['Tall uprights and middle crosspieces', 'Fit the four tall uprights either side of the door and window. While each one has nothing beside it, nail through it into the crosspieces that meet it.'],
+  ['Single upright', 'The one between the door and the right end. Nail through it into the crosspieces either side.'],
+  ['Beam supports', 'Now screw a beam support onto each tall upright, on the side facing the door or window.'],
   ['Both beams', 'Sit each beam on its supports and screw through the uprights into its ends.'],
   ['Under the window', 'Four short uprights, then the plank across their tops.'],
-  ['Middle crosspieces', 'The two in the middle gaps, screwed through the uprights.'],
   ['Short pieces above the beams', 'Cut to fit, then screw down through the top plank into them.'],
   ['Second top plank', 'Full length, on top of the first.'],
   ['Ready to lift', 'Two diagonal braces running opposite ways, plus the tie across the door gap.'],
@@ -325,11 +325,11 @@ function stepOf(m){
     case 'plate': return m.y === H-35 ? 9 : 1;
     case 'stud':  return (m.x === 0 || m.x === L-35) ? 1 : (m.x === 4375 ? 4 : 3);
     case 'cal':   return 2;
-    case 'trim':  return 3;
-    case 'head':  return 5;
-    case 'sill':  return 6;
-    case 'crip':  return m.y === 35 ? 6 : 8;
-    case 'nog':   return (m.x === 125 || m.x === 4410) ? 2 : 7;
+    case 'trim':  return 5;
+    case 'head':  return 6;
+    case 'sill':  return 7;
+    case 'crip':  return m.y === 35 ? 7 : 8;
+    case 'nog':   return (m.x === 125 || m.x === 4410) ? 2 : 3;
     default:      return 11;   // door frame, spacers, window frame
   }
 }
