@@ -189,7 +189,7 @@
       <svg viewBox="-60 -40 720 600" role="img" aria-label="A slice through the top of the wall over the door">
         <g id="sect"></g>
       </svg>
-      <p class="cap">The beam over each opening is two planks stood on their edge with a 20 strip of ply between them, which makes it 90 thick, the same as the wall. On their edge they're much stiffer than laid flat, which matters over the 1.8 m window. The two planks along the top run the full 4980.</p>
+      <p class="cap">The beam over each opening is two planks laid flat, one on top of the other, so it fills the wall's 90 thickness and stands 70 tall. Screw the pair together every 150 or so, alternating sides, so they act as one piece; that matters most over the 1.8 m window. The two planks along the top run the full 4980.</p>
     </section>
   </div>
 
@@ -220,7 +220,7 @@
     <section class="card">
       <h2>What to cut · this wall</h2>
       <div class="tbl"><table id="cut"></table></div>
-      <p class="cap">The three long planks need 5.4 m lengths. Everything else comes out of 2.4 m lengths with almost no waste, so save the offcuts for the short pieces. The ply strips for the beams are 20 thick, cut to the beam's length and 90 wide.</p>
+      <p class="cap">The three long planks need 5.4 m lengths. Everything else comes out of 2.4 m lengths with almost no waste, so save the offcuts for the short pieces.</p>
     </section>
     <section class="card">
       <h2>Where the uprights go</h2>
@@ -259,17 +259,17 @@ add(L-125,35,90,STUD,'cal','Corner strip','an extra upright laid flat on the ins
 // window: gap 600–2420 × 1290–2155, frame 1800 × 845 with its bottom at 1300
 add(565,35,T,2120,'trim','Beam support','holds up the beam over the window',2120);
 add(2420,35,T,2120,'trim','Beam support','holds up the beam over the window',2120);
-add(565,2155,1890,90,'head','Beam over the window','two planks on their edge with a 20 ply strip between',1890,2);
+add(565,2155,1890,70,'head','Beam over the window','two planks laid flat, one on top of the other, screwed together',1890,2);
 add(600,1255,1820,35,'sill','Plank under the window','laid flat; the window sits on it',1820);
 for (const x of [1005,1445,1885,2325]){
   add(x,35,T,1220,'crip','Short upright','under the window, 405 apart',1220);
-  add(x,2245,T,H-70-2245,'crip','Short upright','between the beam and the top planks',H-70-2245);
+  add(x,2225,T,H-70-2225,'crip','Short upright','between the beam and the top planks',H-70-2245);
 }
 // door: gap 2965–3900 × 0–2110
 add(2930,35,T,2075,'trim','Beam support','holds up the beam over the door',2075);
 add(3900,35,T,2075,'trim','Beam support','holds up the beam over the door',2075);
-add(2930,2110,1005,90,'head','Beam over the door','two planks on their edge with a 20 ply strip between',1005,2);
-for (const x of [3335,3775]) add(x,2200,T,H-70-2200,'crip','Short upright','between the beam and the top planks',H-70-2200);
+add(2930,2110,1005,70,'head','Beam over the door','two planks laid flat, one on top of the other, screwed together',1005,2);
+for (const x of [3335,3775]) add(x,2180,T,H-70-2180,'crip','Short upright','between the beam and the top planks',H-70-2200);
 // crosspieces: 405 long, stepped by a plank so both ends can be nailed;
 // the lower edge at 1195 leaves exactly 1160 (one standard batt) above the bottom plank
 const A = [1195], B = [1230];
@@ -288,8 +288,8 @@ for (const [x,y,w,h] of [[610,1300,1800,70],[610,2075,1800,70],[610,1370,70,705]
 const BAYS = [
   [125,405,35,H-70,2200],[2490,405,35,H-70,2200],[3970,405,35,H-70,2200],[4410,445,35,H-70,2200],
   [600,405,35,1255,1000],[1040,405,35,1255,1000],[1480,405,35,1255,1000],[1920,405,35,1255,1000],[2360,60,35,1255,1000],
-  [565,440,2245,H-70],[1040,405,2245,H-70],[1480,405,2245,H-70],[1920,405,2245,H-70],[2360,95,2245,H-70],
-  [2930,405,2200,H-70],[3370,405,2200,H-70],[3810,125,2200,H-70],
+  [565,440,2225,H-70],[1040,405,2225,H-70],[1480,405,2225,H-70],[1920,405,2225,H-70],[2360,95,2225,H-70],
+  [2930,405,2180,H-70],[3370,405,2180,H-70],[3810,125,2180,H-70],
 ];
 
 /* ---------- elevation ---------- */
@@ -313,7 +313,7 @@ const STEPS = [
   ['Tall uprights and middle crosspieces', 'Fit the four tall uprights either side of the door and window. While each one has nothing beside it, nail through it into the crosspieces that meet it.'],
   ['Single upright', 'The one between the door and the right end. Nail through it into the crosspieces either side.'],
   ['Beam supports', 'Now screw a beam support onto each tall upright, on the side facing the door or window.'],
-  ['Both beams', 'Sit each beam on its supports and screw through the uprights into its ends.'],
+  ['Both beams', 'Screw each pair of flat planks together first, every 150 or so, alternating sides. Then sit each beam on its supports and screw through the uprights into its ends.'],
   ['Under the window', 'Four short uprights, then the plank across their tops.'],
   ['Short pieces above the beams', 'Cut to fit, then screw down through the top plank into them.'],
   ['Second top plank', 'Full length, on top of the first.'],
@@ -426,8 +426,8 @@ function draw(){
   text(X(L-45), SY(H)-70, 'end wall', 'lbl2', inside ? 'start' : 'end');
   text(X(81), SY(H)-150, 'corner strip', 'lbl', inside ? 'end' : 'start');
   text(X(L-81), SY(H)-150, 'corner strip', 'lbl', inside ? 'start' : 'end');
-  text(X(1510), SY(2200)+20, 'double beam', 'lbl2');
-  text(X(3432), SY(2155)+20, 'double beam', 'lbl2');
+  text(X(1510), SY(2190)+20, 'double beam', 'lbl2');
+  text(X(3432), SY(2145)+20, 'double beam', 'lbl2');
   text(X(1510), SY(1722)-60, 'window 1800 × 845', 'lbl2');
   // dimensions
   hdim(610, 2410, 1700, '1800');
@@ -530,8 +530,8 @@ for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','
   const r = (x,y,w,h,fill,extra={}) => el('rect', Object.assign({x, y:Y(y+h), width:w, height:h, fill, class:'d-m'}, extra), g);
   const t = (x,y,s,cls='d-lbl') => { const e = el('text', {x, y, class:cls}, g); e.textContent = s; return e; };
   r(0,H-35,90,35,'var(--plate)'); r(0,H-70,90,35,'var(--plate)');
-  r(0,2200,90,H-70-2200,'var(--crip)');
-  r(0,2110,35,90,'var(--head)'); r(35,2110,20,90,'var(--ply)'); r(55,2110,35,90,'var(--head)');
+  r(0,2180,90,H-70-2180,'var(--crip)');
+  r(0,2110,90,35,'var(--head)'); r(0,2145,90,35,'var(--head)');
   r(0,2105,102,5,'var(--pack)'); r(0,2075,102,30,'var(--jamb)');
   r(50,2045,12,30,'var(--jamb)');
   r(62,1990,40,82,'var(--leaf)', {opacity:.55});
@@ -540,14 +540,14 @@ for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','
   lead(80,H-18,190,H-18); t(198,Y(H-18)+5,'two planks along the top');
   lead(70,2280,190,2280); t(198,Y(2280)+5,'short upright');
   lead(96,2330,190,2335); t(198,Y(2335)+5,'OSB lining','d-lbl2');
-  lead(80,2155,190,2190); t(198,Y(2190)+5,'double beam: two planks on their edge');
-  t(198,Y(2190)+24,'with a 20 strip of ply between them','d-lbl2');
+  lead(70,2150,190,2190); t(198,Y(2190)+5,'double beam: two planks laid flat');
+  t(198,Y(2190)+24,'one on top of the other, screwed together','d-lbl2');
   lead(97,2090,190,2090); t(198,Y(2090)+5,'top of the door frame, on spacers');
   lead(82,2020,190,2020); t(198,Y(2020)+5,'door (40 thick) shuts against a thin strip','d-lbl2');
   t(-50,Y(1990)+30,'outside','d-lbl2'); t(60,Y(1990)+30,'inside','d-lbl2');
   const dg = el('g', {class:'dim'}, g);
   el('line', {x1:-30, y1:Y(2110), x2:-30, y2:Y(H), style:'stroke-width:1.5'}, dg);
-  for (const y of [2110,2200,H-70,H]) el('line', {x1:-36, y1:Y(y)+6, x2:-24, y2:Y(y)-6, style:'stroke-width:1.5'}, dg);
+  for (const y of [2110,2180,H-70,H]) el('line', {x1:-36, y1:Y(y)+6, x2:-24, y2:Y(y)-6, style:'stroke-width:1.5'}, dg);
 }
 
 /* ---------- close-up: holding the door gap for the lift ---------- */
