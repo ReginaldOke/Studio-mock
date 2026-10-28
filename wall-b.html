@@ -14,7 +14,7 @@
     --cavity:#e3e6e0; --hi:#ffffff;
     --plate:#7f96ad; --stud:#86ab8c; --trim:#5d9468; --crip:#b4cfb8; --cal:#3d8a84; --nog:#d9a05e;
     --head:#a8653a; --sill:#9db0c2; --jamb:#9c7c58; --pack:#d6b258; --leaf:#7a5c40;
-    --frame:#b98a6a; --glass:#8fb4c4; --osb:#c9a25e; --ply:#cdb48a; --insul:#ecdfb3; --tie:rgba(193,78,56,.22); --tape:#f2cf3f;
+    --frame:#b98a6a; --glass:#8fb4c4; --osb:#c9a25e; --ply:#cdb48a; --insul:#ecdfb3; --tie:rgba(193,78,56,.22);
     --f-display:'Archivo', system-ui, -apple-system, sans-serif;
     --f-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   }
@@ -22,13 +22,13 @@
     :root:not([data-theme="light"]){
       --bg:#15181c; --card:#1c2025; --ink:#e9e7e2; --ink2:#9aa0a6; --line:rgba(233,231,226,.14);
       --accent:#ff8a68; --accent-soft:rgba(255,138,104,.14); --halo:#1c2025; --edge:rgba(6,8,10,.7);
-      --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; --insul:#4a4433; --tie:rgba(255,138,104,.26); --tape:#b8962a; color-scheme:dark;
+      --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; --insul:#4a4433; --tie:rgba(255,138,104,.26); color-scheme:dark;
     }
   }
   :root[data-theme="dark"]{
     --bg:#15181c; --card:#1c2025; --ink:#e9e7e2; --ink2:#9aa0a6; --line:rgba(233,231,226,.14);
     --accent:#ff8a68; --accent-soft:rgba(255,138,104,.14); --halo:#1c2025; --edge:rgba(6,8,10,.7);
-    --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; --insul:#4a4433; --tie:rgba(255,138,104,.26); --tape:#b8962a; color-scheme:dark;
+    --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; --insul:#4a4433; --tie:rgba(255,138,104,.26); color-scheme:dark;
   }
   *{box-sizing:border-box}
   body{
@@ -62,15 +62,9 @@
   .panel{display:grid; gap:18px}
   .panel > *{min-width:0}
   #mkSvg{display:block; width:100%; height:auto}
-  .tape{fill:var(--tape); stroke:var(--edge); stroke-width:3}
-  .tick{stroke:var(--ink); stroke-width:4}
-  .tnum{font:600 60px var(--f-mono); fill:var(--ink)}
-  .mkx{stroke:var(--ink); stroke-width:5; pointer-events:none}
   .mkm{font:600 92px var(--f-mono); fill:var(--accent); paint-order:stroke; stroke:var(--halo); stroke-width:18; stroke-linejoin:round}
   .mks{font:500 76px var(--f-mono); fill:var(--ink2); paint-order:stroke; stroke:var(--halo); stroke-width:16; stroke-linejoin:round}
-  .mkrow{font:600 70px var(--f-display); fill:var(--ink2)}
   .mkgap{font:500 64px var(--f-mono); fill:var(--ink2)}
-  .ghostsup{fill:none; stroke:var(--trim); stroke-width:5; stroke-dasharray:14 10}
   .mt td.list{white-space:normal; text-align:right}
   .mt tr.sub td{color:var(--ink2); font-size:11px; text-transform:uppercase; letter-spacing:.07em; font-weight:700; padding-top:14px; border-top:0}
   .mt td.hl{color:var(--accent); font-weight:600}
@@ -150,7 +144,7 @@
     .d-lbl{font-size:18px} .d-lbl2{font-size:16px}
     .tlbl{font-size:50px} .tlbl2{font-size:44px} .tdim{font-size:46px}
     .pcap{flex-basis:100%}
-    .mkm{font-size:170px; stroke-width:30} .mks{font-size:140px; stroke-width:26} .tnum{font-size:110px} .tnum.half{display:none} .mkrow{font-size:120px} .mkgap{font-size:110px}
+    .mkm{font-size:170px; stroke-width:30} .mks{font-size:140px; stroke-width:26} .mkgap{font-size:110px}
   }
 </style>
 
@@ -178,8 +172,8 @@
 
   <div class="panel" id="pMark" role="tabpanel" aria-labelledby="tMark" hidden>
     <section class="card">
-      <h2>Top and bottom planks, side by side · seen from the face that's up</h2>
-      <svg id="mkSvg" role="img" aria-label="The top plank and the two bottom plank pieces laid side by side with a tape along them, showing where each upright is marked"></svg>
+      <h2>Where the uprights go · seen from outside, window end on the left</h2>
+      <svg id="mkSvg" role="img" aria-label="The wall frame seen from outside with each upright's distance from the window end marked below it"></svg>
       <div class="legend" id="mkLegend"></div>
     </section>
     <div class="mkgrid">
@@ -708,45 +702,33 @@ for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','
 /* ---------- mark-out drawing ---------- */
 {
   const mk = document.getElementById('mkSvg');
-  const TOP = 510, BOT = 620, PH = 90;          // plank rows (y down), 90 wide face
-  mk.setAttribute('viewBox', `-140 -30 ${L+760} 1230`);
+  mk.setAttribute('viewBox', `-260 -470 ${L+520} ${H+470+640}`);
   const e = (tag, a) => el(tag, a, mk);
   const tx = (x, y, str, cls, anchor='middle', rot=false) => {
     const n = e('text', Object.assign({x, y, class:cls, 'text-anchor':anchor}, rot ? {transform:`rotate(-90 ${x} ${y})`} : {}));
     n.textContent = str; return n; };
-  // tape
-  e('rect', {class:'tape', x:0, y:0, width:L, height:120});
-  for (let x = 0; x <= L; x += 100) e('line', {class:'tick', x1:x, y1:0, x2:x, y2: x % 500 ? 30 : 60});
-  for (let x = 500; x < L; x += 500) tx(x, 108, String(x), x % 1000 ? 'tnum half' : 'tnum');
-  // planks
-  e('rect', {x:0, y:TOP, width:L, height:PH, fill:'var(--plate)', class:'d-m', style:'stroke-width:4'});
-  e('rect', {x:0, y:BOT, width:2965, height:PH, fill:'var(--plate)', class:'d-m', style:'stroke-width:4'});
-  e('rect', {x:3900, y:BOT, width:L-3900, height:PH, fill:'var(--plate)', class:'d-m', style:'stroke-width:4'});
-  tx(3432, BOT+66, 'door gap 935', 'mkgap');
-  tx(L+60, TOP+68, 'top', 'mkrow', 'start');
-  tx(L+60, BOT+68, 'bottom', 'mkrow', 'start');
-  // marks
-  const box = (x, w, y, h, fill) => {
-    e('rect', {x, y, width:w, height:h, fill, class:'d-m', style:'stroke-width:3'});
-    e('line', {class:'mkx', x1:x, y1:y, x2:x+w, y2:y+h}); e('line', {class:'mkx', x1:x, y1:y+h, x2:x+w, y2:y});
-  };
+  // the frame as seen from outside, window end on the left; no door or window so the uprights read clearly
+  e('line', {class:'ground', x1:-200, y1:SY(0), x2:L+200, y2:SY(0)});
   for (const m of M){
-    if (m.t === 'stud' || m.t === 'cal'){ box(m.x, m.w, TOP, PH, `var(${TYPES[m.t].c})`); box(m.x, m.w, BOT, PH, `var(${TYPES[m.t].c})`); }
-    else if (m.t === 'crip') box(m.x, m.w, m.y === 35 ? BOT : TOP, PH, 'var(--crip)');
-    else if (m.t === 'trim') e('rect', {class:'ghostsup', x:m.x, y:BOT, width:m.w, height:PH});
+    if (['jamb','pack','frame'].includes(m.t)) continue;
+    const key = ['stud','cal','crip'].includes(m.t);
+    e('rect', {x:m.x, y:SY(m.y+m.h), width:m.w, height:m.h, fill:`var(${TYPES[m.t].c})`, class:'d-m',
+      style: key ? 'stroke-width:4' : 'stroke-width:3; opacity:.5'});
   }
-  // tape lines down to the main marks + their numbers below
-  for (const x of [530, 2455, 2895, 3935, 4375]){
-    e('line', {class:'dim', x1:x, y1:120, x2:x, y2:BOT+PH, style:'stroke:var(--accent); stroke-width:4; stroke-dasharray:18 12; opacity:.6'});
-    tx(x+30, BOT+PH+40, String(x), 'mkm', 'end', true);
+  tx(1510, SY(1720), 'window gap', 'mkgap'); tx(3432, SY(1100), 'door gap', 'mkgap');
+  // every tall upright measured from the window end: dashed line down to one tape line, number below
+  const BY = SY(-140);
+  e('line', {x1:0, y1:BY, x2:L, y2:BY, style:'stroke:var(--accent); stroke-width:5'});
+  for (const x of [0, 530, 2455, 2895, 3935, 4375, 4855]){
+    e('line', {x1:x, y1:SY(0)+12, x2:x, y2:BY, style:'stroke:var(--accent); stroke-width:3; stroke-dasharray:16 10; opacity:.75'});
+    e('circle', {cx:x, cy:BY, r: x ? 14 : 24, fill:'var(--accent)'});
+    tx(x+34, BY+40, String(x), 'mkm', 'end', true);
   }
-  tx(110, BOT+PH+40, '35', 'mkm', 'end', true);
-  tx(4885, BOT+PH+40, '4855', 'mkm', 'end', true);
-  // short uprights: numbers above the top plank
-  for (const x of [1005, 1445, 1885, 2325, 3335, 3775]) tx(x+30, TOP-30, String(x), 'mks', 'start', true);
+  // short uprights: numbers above the wall (the ones under the window share the same marks)
+  for (const x of [1005, 1445, 1885, 2325, 3335, 3775]) tx(x+28, SY(H)-40, String(x), 'mks', 'start', true);
   // legend
   const lg = document.getElementById('mkLegend');
-  for (const [c, n, dash] of [['--stud','Tall upright'],['--cal','Corner strip (laid flat)'],['--crip','Short upright'],['--trim','Beam support, no mark needed', true]]){
+  for (const [c, n, dash] of [['--stud','Tall upright'],['--cal','Corner strip (laid flat)'],['--crip','Short upright'],['--accent','Measured from the window end (0)']]){
     const sp = document.createElement('span'); const i = document.createElement('i');
     i.style.background = dash ? 'transparent' : `var(${c})`; if (dash) i.style.border = `2px dashed var(${c})`;
     sp.append(i, n); lg.appendChild(sp);
