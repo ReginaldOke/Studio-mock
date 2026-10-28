@@ -701,17 +701,21 @@ for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','
   const tx = (x, y, str, cls, anchor='middle', rot=false) => {
     const n = e('text', Object.assign({x, y, class:cls, 'text-anchor':anchor}, rot ? {transform:`rotate(-90 ${x} ${y})`} : {}));
     n.textContent = str; return n; };
-  // the frame as seen from outside, window end on the left; no door or window so the uprights read clearly
+  // only what gets marked: the top and bottom planks and the uprights that sit on them
   e('line', {class:'ground', x1:-200, y1:SY(0), x2:L+200, y2:SY(0)});
   for (const m of M){
-    if (['jamb','pack','frame'].includes(m.t)) continue;
-    const key = ['stud','cal','crip'].includes(m.t);
-    e('rect', {x:m.x, y:SY(m.y+m.h), width:m.w, height:m.h, fill:`var(${TYPES[m.t].c})`, class:'d-m',
-      style: key ? 'stroke-width:4' : 'stroke-width:3; opacity:.5'});
+    if (!['plate','stud','cal','crip'].includes(m.t)) continue;
+    e('rect', {x:m.x, y:SY(m.y+m.h), width:m.w, height:m.h, fill:`var(${TYPES[m.t].c})`, class:'d-m', style:'stroke-width:4'});
   }
-  tx(1510, SY(1720), 'window gap', 'mkgap'); tx(3432, SY(1100), 'door gap', 'mkgap');
+  tx(1510, SY(1720), 'window', 'mkgap'); tx(3432, SY(1100), 'door', 'mkgap');
+  // the edge each number is measured to, picked out in red
+  const edge = (x, side, y0, y1) => e('rect', {x: side < 0 ? x : x-12, y:SY(y1), width:12, height:y1-y0, fill:'var(--accent)'});
+  for (const x of [35, 530, 2455]) edge(x, -1, 35, H-70);
+  for (const x of [4410, 3970, 2930, L-35]) edge(x, 1, 35, H-70);
+  for (const x of [1005, 1445, 1885, 2325]){ edge(x, -1, 35, 1255); edge(x, -1, 2225, H-70); }
+  for (const x of [3370, 3810]) edge(x, 1, 2180, H-70);
   // each upright measured from the closer end of the frame to its closest edge
-  const BY = SY(-140), MID = 2472;
+  const BY = SY(-140), MID = 2692;
   const run = (from, marks, cap, capX) => {
     e('line', {x1:from, y1:BY, x2:MID, y2:BY, style:'stroke:var(--accent); stroke-width:5'});
     e('circle', {cx:from, cy:BY, r:24, fill:'var(--accent)'});
@@ -728,10 +732,11 @@ for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','
   e('line', {x1:MID, y1:BY-50, x2:MID, y2:BY+50, style:'stroke:var(--accent); stroke-width:5'});
   // short uprights: numbers above the wall, from the closer end (the ones under the window share the same marks)
   for (const x of [1005, 1445, 1885, 2325]) tx(x+28, SY(H)-40, String(x), 'mks', 'start', true);
-  for (const x of [3335, 3775]) tx(x+28, SY(H)-40, String(L-x-35), 'mks', 'start', true);
+  for (const x of [3370, 3810]) tx(x-7, SY(H)-40, String(L-x), 'mks', 'start', true);
+  tx(63, SY(H)-40, '35', 'mks', 'start', true); tx(L-35, SY(H)-40, '35', 'mks', 'start', true);   // corner strips
   // legend
   const lg = document.getElementById('mkLegend');
-  for (const [c, n, dash] of [['--stud','Tall upright'],['--cal','Corner strip (laid flat)'],['--crip','Short upright'],['--accent','Measured from the closer end (0)']]){
+  for (const [c, n, dash] of [['--stud','Tall upright'],['--cal','Corner strip (laid flat)'],['--crip','Short upright'],['--accent','Edge you measure to, from the closer end (0)']]){
     const sp = document.createElement('span'); const i = document.createElement('i');
     i.style.background = dash ? 'transparent' : `var(${c})`; if (dash) i.style.border = `2px dashed var(${c})`;
     sp.append(i, n); lg.appendChild(sp);
