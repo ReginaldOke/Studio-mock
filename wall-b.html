@@ -14,7 +14,7 @@
     --cavity:#e3e6e0; --hi:#ffffff;
     --plate:#7f96ad; --stud:#86ab8c; --trim:#5d9468; --crip:#b4cfb8; --cal:#3d8a84; --nog:#d9a05e;
     --head:#a8653a; --sill:#9db0c2; --jamb:#9c7c58; --pack:#d6b258; --leaf:#7a5c40;
-    --frame:#b98a6a; --glass:#8fb4c4; --osb:#c9a25e; --ply:#cdb48a; --insul:#ecdfb3; --tie:rgba(193,78,56,.22);
+    --frame:#b98a6a; --glass:#8fb4c4; --osb:#c9a25e; --ply:#cdb48a; --insul:#ecdfb3; --tie:rgba(193,78,56,.22); --tape:#f2cf3f;
     --f-display:'Archivo', system-ui, -apple-system, sans-serif;
     --f-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   }
@@ -22,13 +22,13 @@
     :root:not([data-theme="light"]){
       --bg:#15181c; --card:#1c2025; --ink:#e9e7e2; --ink2:#9aa0a6; --line:rgba(233,231,226,.14);
       --accent:#ff8a68; --accent-soft:rgba(255,138,104,.14); --halo:#1c2025; --edge:rgba(6,8,10,.7);
-      --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; --insul:#4a4433; --tie:rgba(255,138,104,.26); color-scheme:dark;
+      --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; --insul:#4a4433; --tie:rgba(255,138,104,.26); --tape:#b8962a; color-scheme:dark;
     }
   }
   :root[data-theme="dark"]{
     --bg:#15181c; --card:#1c2025; --ink:#e9e7e2; --ink2:#9aa0a6; --line:rgba(233,231,226,.14);
     --accent:#ff8a68; --accent-soft:rgba(255,138,104,.14); --halo:#1c2025; --edge:rgba(6,8,10,.7);
-    --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; --insul:#4a4433; --tie:rgba(255,138,104,.26); color-scheme:dark;
+    --cavity:#262b31; --hi:#2a3036; --crip:#9dbaa2; --insul:#4a4433; --tie:rgba(255,138,104,.26); --tape:#b8962a; color-scheme:dark;
   }
   *{box-sizing:border-box}
   body{
@@ -52,7 +52,30 @@
   .sheet{padding:12px 12px 10px}
   .draw{overflow-x:auto; -webkit-overflow-scrolling:touch}
   .draw svg{display:block; width:100%; height:auto}
+  [hidden]{display:none !important}
   .zoomonly{display:none}
+  .tabs{display:flex; gap:2px; border-bottom:1px solid var(--line)}
+  .tabs button{appearance:none; border:0; border-bottom:2px solid transparent; background:transparent; color:var(--ink2);
+    font:700 14px var(--f-display); padding:9px 14px 10px; cursor:pointer; white-space:nowrap; margin-bottom:-1px}
+  .tabs button[aria-selected="true"]{color:var(--accent); border-bottom-color:var(--accent)}
+  .tabs button:focus-visible{outline:2px solid var(--accent); outline-offset:-2px; border-radius:6px}
+  .panel{display:grid; gap:18px}
+  .panel > *{min-width:0}
+  #mkSvg{display:block; width:100%; height:auto}
+  .tape{fill:var(--tape); stroke:var(--edge); stroke-width:3}
+  .tick{stroke:var(--ink); stroke-width:4}
+  .tnum{font:600 60px var(--f-mono); fill:var(--ink)}
+  .mkx{stroke:var(--ink); stroke-width:5; pointer-events:none}
+  .mkm{font:600 92px var(--f-mono); fill:var(--accent); paint-order:stroke; stroke:var(--halo); stroke-width:18; stroke-linejoin:round}
+  .mks{font:500 76px var(--f-mono); fill:var(--ink2); paint-order:stroke; stroke:var(--halo); stroke-width:16; stroke-linejoin:round}
+  .mkrow{font:600 70px var(--f-display); fill:var(--ink2)}
+  .mkgap{font:500 64px var(--f-mono); fill:var(--ink2)}
+  .ghostsup{fill:none; stroke:var(--trim); stroke-width:5; stroke-dasharray:14 10}
+  .mt td.list{white-space:normal; text-align:right}
+  .mt tr.sub td{color:var(--ink2); font-size:11px; text-transform:uppercase; letter-spacing:.07em; font-weight:700; padding-top:14px; border-top:0}
+  .mt td.hl{color:var(--accent); font-weight:600}
+  .mkgrid{display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:18px; align-items:start}
+  @media (max-width:860px){ .mkgrid{grid-template-columns:minmax(0,1fr)} }
   .legend{display:flex; flex-wrap:wrap; gap:6px 14px; padding:8px 6px 2px; font-size:12px; color:var(--ink2)}
   .legend span{display:inline-flex; align-items:center; gap:6px}
   .legend i{width:12px; height:12px; border-radius:3px; display:inline-block; border:1px solid var(--edge)}
@@ -127,6 +150,7 @@
     .d-lbl{font-size:18px} .d-lbl2{font-size:16px}
     .tlbl{font-size:50px} .tlbl2{font-size:44px} .tdim{font-size:46px}
     .pcap{flex-basis:100%}
+    .mkm{font-size:170px; stroke-width:30} .mks{font-size:140px; stroke-width:26} .tnum{font-size:110px} .tnum.half{display:none} .mkrow{font-size:120px} .mkgap{font-size:110px}
   }
 </style>
 
@@ -147,6 +171,63 @@
     </div>
   </header>
 
+  <div class="tabs" role="tablist" aria-label="Page">
+    <button role="tab" id="tWall" aria-selected="true" aria-controls="pWall">Whole wall</button>
+    <button role="tab" id="tMark" aria-selected="false" aria-controls="pMark" tabindex="-1">Mark out</button>
+  </div>
+
+  <div class="panel" id="pMark" role="tabpanel" aria-labelledby="tMark" hidden>
+    <section class="card">
+      <h2>Top and bottom planks, side by side · seen from the face that's up</h2>
+      <svg id="mkSvg" role="img" aria-label="The top plank and the two bottom plank pieces laid side by side with a tape along them, showing where each upright is marked"></svg>
+      <div class="legend" id="mkLegend"></div>
+    </section>
+    <div class="mkgrid">
+      <section class="card">
+        <h2>Where to mark · from the window end</h2>
+        <div class="tbl"><table class="mt">
+          <thead><tr><th>Upright</th><th class="n">From</th><th class="n">To</th></tr></thead>
+          <tbody>
+            <tr class="sub"><td colspan="3">Tall uprights · both planks</td></tr>
+            <tr><td><span class="sw" style="background:var(--stud)"></span>End upright</td><td class="n mono">0</td><td class="n mono">35</td></tr>
+            <tr><td><span class="sw" style="background:var(--cal)"></span>Corner strip (flat)</td><td class="n mono">35</td><td class="n mono">125</td></tr>
+            <tr><td><span class="sw" style="background:var(--stud)"></span>Left of window</td><td class="n mono hl">530</td><td class="n mono">565</td></tr>
+            <tr><td><span class="sw" style="background:var(--stud)"></span>Right of window</td><td class="n mono hl">2455</td><td class="n mono">2490</td></tr>
+            <tr><td><span class="sw" style="background:var(--stud)"></span>Left of door</td><td class="n mono hl">2895</td><td class="n mono">2930</td></tr>
+            <tr><td><span class="sw" style="background:var(--stud)"></span>Right of door</td><td class="n mono hl">3935</td><td class="n mono">3970</td></tr>
+            <tr><td><span class="sw" style="background:var(--stud)"></span>Single upright</td><td class="n mono hl">4375</td><td class="n mono">4410</td></tr>
+            <tr><td><span class="sw" style="background:var(--cal)"></span>Corner strip (flat)</td><td class="n mono">4855</td><td class="n mono">4945</td></tr>
+            <tr><td><span class="sw" style="background:var(--stud)"></span>End upright</td><td class="n mono">4945</td><td class="n mono">4980</td></tr>
+            <tr class="sub"><td colspan="3">Short bottom piece · from its door-gap end</td></tr>
+            <tr><td><span class="sw" style="background:var(--stud)"></span>Right of door</td><td class="n mono">35</td><td class="n mono">70</td></tr>
+            <tr><td><span class="sw" style="background:var(--stud)"></span>Single upright</td><td class="n mono">475</td><td class="n mono">510</td></tr>
+            <tr><td><span class="sw" style="background:var(--cal)"></span>Corner strip (flat)</td><td class="n mono">955</td><td class="n mono">1045</td></tr>
+            <tr><td><span class="sw" style="background:var(--stud)"></span>End upright</td><td class="n mono">1045</td><td class="n mono">1080</td></tr>
+            <tr class="sub"><td colspan="3">Short uprights · bottom plank (under the window)</td></tr>
+            <tr><td><span class="sw" style="background:var(--crip)"></span>Four short uprights</td><td class="n mono list" colspan="2">1005 · 1445 · 1885 · 2325</td></tr>
+            <tr class="sub"><td colspan="3">Short uprights · top plank (above the beams)</td></tr>
+            <tr><td><span class="sw" style="background:var(--crip)"></span>Above the window</td><td class="n mono list" colspan="2">1005 · 1445 · 1885 · 2325</td></tr>
+            <tr><td><span class="sw" style="background:var(--crip)"></span>Above the door</td><td class="n mono list" colspan="2">3335 · 3775</td></tr>
+            <tr class="sub"><td colspan="3">Plank under the window · from its own end</td></tr>
+            <tr><td><span class="sw" style="background:var(--sill)"></span>Same four short uprights</td><td class="n mono list" colspan="2">405 · 845 · 1285 · 1725</td></tr>
+          </tbody>
+        </table></div>
+        <p class="cap">Each number is the edge nearest the window end; the upright sits on the far side of it. Use the short-piece numbers if you'd rather mark the door-end bottom piece on its own.</p>
+      </section>
+      <section class="card">
+        <h2>How to mark</h2>
+        <ol class="steps">
+          <li>Lay the top plank and the two bottom plank pieces side by side, face up, with the window ends lined up flush and the <span class="mono">935</span> door gap in the bottom plank. Clamp them together.</li>
+          <li>Hook the tape on the window end and run it the full length. Read every mark off the tape from that one end, never from mark to mark, so small errors don't add up.</li>
+          <li>At each number, draw a square line across both planks, then a second line <span class="mono">35</span> further on (<span class="mono">90</span> for the corner strips). Put an X between the lines so you know which side the upright goes.</li>
+          <li>Short uprights only go on one plank: the ones under the window on the bottom plank, the ones above the beams on the top plank.</li>
+          <li>Check before you screw: the window gap is <span class="mono">600–2420</span> and the door gap <span class="mono">2965–3900</span> once the beam supports sit beside the tall uprights (the dashed outlines). They need no marks of their own.</li>
+        </ol>
+      </section>
+    </div>
+  </div>
+
+  <div class="panel" id="pWall" role="tabpanel" aria-labelledby="tWall">
   <section class="card sheet" aria-label="Wall B elevation">
     <div class="player" id="player">
       <button id="pPlay" class="pbtn primary">Play build order</button>
@@ -240,8 +321,9 @@
     <section class="card">
       <h2>Where the uprights go</h2>
       <div class="tbl"><table id="mark"></table></div>
-      <p class="cap">Measured from the window end (the left as seen from outside) to the near edge of each upright. Lay the bottom plank and the lower top plank side by side, clamp them, and mark both at once.</p>
+      <p class="cap">Measured from the window end (the left as seen from outside) to the near edge of each upright. The Mark out tab has these as a drawing.</p>
     </section>
+  </div>
   </div>
 </div>
 
@@ -621,6 +703,77 @@ for (const k of ['plate','stud','cal','trim','crip','head','sill','nog','jamb','
   for (const [x, names] of [...byX.entries()].sort((a,b)=>a[0]-b[0]))
     mh += `<tr><td class="n mono">${x}</td><td>${[...names].join(' + ')}</td></tr>`;
   document.getElementById('mark').innerHTML = mh + '</tbody>';
+}
+
+/* ---------- mark-out drawing ---------- */
+{
+  const mk = document.getElementById('mkSvg');
+  const TOP = 510, BOT = 620, PH = 90;          // plank rows (y down), 90 wide face
+  mk.setAttribute('viewBox', `-140 -30 ${L+760} 1230`);
+  const e = (tag, a) => el(tag, a, mk);
+  const tx = (x, y, str, cls, anchor='middle', rot=false) => {
+    const n = e('text', Object.assign({x, y, class:cls, 'text-anchor':anchor}, rot ? {transform:`rotate(-90 ${x} ${y})`} : {}));
+    n.textContent = str; return n; };
+  // tape
+  e('rect', {class:'tape', x:0, y:0, width:L, height:120});
+  for (let x = 0; x <= L; x += 100) e('line', {class:'tick', x1:x, y1:0, x2:x, y2: x % 500 ? 30 : 60});
+  for (let x = 500; x < L; x += 500) tx(x, 108, String(x), x % 1000 ? 'tnum half' : 'tnum');
+  // planks
+  e('rect', {x:0, y:TOP, width:L, height:PH, fill:'var(--plate)', class:'d-m', style:'stroke-width:4'});
+  e('rect', {x:0, y:BOT, width:2965, height:PH, fill:'var(--plate)', class:'d-m', style:'stroke-width:4'});
+  e('rect', {x:3900, y:BOT, width:L-3900, height:PH, fill:'var(--plate)', class:'d-m', style:'stroke-width:4'});
+  tx(3432, BOT+66, 'door gap 935', 'mkgap');
+  tx(L+60, TOP+68, 'top', 'mkrow', 'start');
+  tx(L+60, BOT+68, 'bottom', 'mkrow', 'start');
+  // marks
+  const box = (x, w, y, h, fill) => {
+    e('rect', {x, y, width:w, height:h, fill, class:'d-m', style:'stroke-width:3'});
+    e('line', {class:'mkx', x1:x, y1:y, x2:x+w, y2:y+h}); e('line', {class:'mkx', x1:x, y1:y+h, x2:x+w, y2:y});
+  };
+  for (const m of M){
+    if (m.t === 'stud' || m.t === 'cal'){ box(m.x, m.w, TOP, PH, `var(${TYPES[m.t].c})`); box(m.x, m.w, BOT, PH, `var(${TYPES[m.t].c})`); }
+    else if (m.t === 'crip') box(m.x, m.w, m.y === 35 ? BOT : TOP, PH, 'var(--crip)');
+    else if (m.t === 'trim') e('rect', {class:'ghostsup', x:m.x, y:BOT, width:m.w, height:PH});
+  }
+  // tape lines down to the main marks + their numbers below
+  for (const x of [530, 2455, 2895, 3935, 4375]){
+    e('line', {class:'dim', x1:x, y1:120, x2:x, y2:BOT+PH, style:'stroke:var(--accent); stroke-width:4; stroke-dasharray:18 12; opacity:.6'});
+    tx(x+30, BOT+PH+40, String(x), 'mkm', 'end', true);
+  }
+  tx(110, BOT+PH+40, '35', 'mkm', 'end', true);
+  tx(4885, BOT+PH+40, '4855', 'mkm', 'end', true);
+  // short uprights: numbers above the top plank
+  for (const x of [1005, 1445, 1885, 2325, 3335, 3775]) tx(x+30, TOP-30, String(x), 'mks', 'start', true);
+  // legend
+  const lg = document.getElementById('mkLegend');
+  for (const [c, n, dash] of [['--stud','Tall upright'],['--cal','Corner strip (laid flat)'],['--crip','Short upright'],['--trim','Beam support, no mark needed', true]]){
+    const sp = document.createElement('span'); const i = document.createElement('i');
+    i.style.background = dash ? 'transparent' : `var(${c})`; if (dash) i.style.border = `2px dashed var(${c})`;
+    sp.append(i, n); lg.appendChild(sp);
+  }
+}
+
+/* ---------- tabs ---------- */
+{
+  const tabs = [document.getElementById('tWall'), document.getElementById('tMark')];
+  const ctrls = document.querySelector('header.top .ctrls');
+  const pick = (t, focus) => {
+    for (const b of tabs){
+      const on = b === t;
+      b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1;
+      document.getElementById(b.getAttribute('aria-controls')).hidden = !on;
+    }
+    ctrls.hidden = t.id !== 'tWall';
+    if (t.id !== 'tWall') stopPlay();
+    if (focus) t.focus();
+  };
+  tabs.forEach((b, i) => {
+    b.addEventListener('click', () => pick(b));
+    b.addEventListener('keydown', ev => {
+      if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft'){ ev.preventDefault(); pick(tabs[(i + (ev.key === 'ArrowRight' ? 1 : tabs.length-1)) % tabs.length], true); }
+    });
+  });
+  if (location.hash === '#markout') pick(tabs[1]);
 }
 
 setView(inside);
